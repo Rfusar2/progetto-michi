@@ -1,0 +1,73 @@
+#sidebar {
+    display: grid;
+    grid-template-rows: 10% 90%;
+    width: var(--width-sidebar);
+    background: var(--bg-card);
+    border-right: 1px solid #fff2;
+}
+#sidebar > header {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 50% 50%;
+}
+.divider {
+    border-bottom: 1px solid #fff1;
+    margin: 0px 20px;
+
+}
+
+
+#container-aside-items{
+    display: flex;
+    gap: 25px;
+    flex-direction: column;
+    margin-top: 20px;
+}
+.aside-item {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    width: 80%;
+    cursor: pointer;
+}
+
+.container-circle{
+    position: relative;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    padding: 5px;
+    top: 3px;
+    right: 10px;
+    transition: 300ms;
+}
+
+a {
+    display: block;
+    text-decoration: none;
+    transition: 300ms;
+}
+
+#sidebar > section > footer {
+    height: 30%;
+}
+
+#logout {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#logout > a {
+    border-radius: 50%;
+    padding: 10px;
+    background: var(--error);
+    cursor: pointer;
+}
+
+.aside-item[active=true] {
+    border-right: 1px solid var(--light-blue);
+}

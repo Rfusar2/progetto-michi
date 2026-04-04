@@ -1,0 +1,4 @@
+app/database
+app/static/js
+node_modules
+package-lock.json

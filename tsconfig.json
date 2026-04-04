@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "./app/static/js",
+    "rootDir": "./frontend/source",
+    "module": "commonjs",
+    "target": "es2021",
+    "strict": true
+  }
+}

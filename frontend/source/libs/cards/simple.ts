@@ -1,0 +1,51 @@
+enum ConfigCardStyle {
+    PRIMARY,
+    ERROR,
+    SUCCESS
+}
+
+type ConfigCardProps = {
+    parent: HTMLElement;
+    title: string;
+    style: ConfigCardStyle;
+    content: string;
+    note: string;
+    view: boolean;
+}
+
+class Card {
+    parent: HTMLElement;
+    title: string;
+    style: ConfigCardStyle;
+    content: string;
+    note: string;
+    obj = new TAG_HTML("div").class(["card", "card-details"]).attr({colorschema:"dark"}).obj;
+    constructor({parent, title, style, content, note, view}: ConfigCardProps){
+        this.parent = parent;
+        this.parent.append(this.obj);
+        this.obj.style.visibility = view ? "visible" : "hidden"
+        this.title = title;
+        this.style = style;
+        this.content = content;
+        this.note = note;
+
+        this.init();
+    }
+
+    init(){
+        const [header, main, footer] = [ "header", "main", "footer"].map((e:string)=>new TAG_HTML(e).obj)
+        const title = new TAG_HTML("span").class(["card-details-title"]).props({textContent: this.title}).attr({colorschema:"dark"}).obj
+        header.append(title);
+        
+        const main_containers = ["div", "div"].map((e:string)=>new TAG_HTML(e).obj);
+        main_containers[1].append(
+            new TAG_HTML("span").class(["card-details-content"]).props({textContent: this.content}).attr({colorschema:"dark"}).obj
+        )
+        main.append(...main_containers);
+        
+        const note = new TAG_HTML("span").class(["card-details-note"]).props({textContent: this.note}).attr({colorschema:"dark"}).obj;
+        footer.append(note);
+
+        this.obj.append(header, main, footer);
+    }
+}

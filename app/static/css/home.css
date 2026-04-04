@@ -1,0 +1,36 @@
+@keyframes open-large-section1 {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+#home-section1{
+    display:flex;
+    justify-content: space-between;
+    padding: 10px;
+    animation: open-large-section1 500ms linear forwards;
+    width: 100%;
+}
+
+#home-section1[data-colorschema="dark"]{
+    background: var(--bg-card);
+    border: 1px solid #fff2;
+}
+#home-section1[data-colorschema="light"]{
+    background: #fff;
+    border: 1px solid #0002;
+}
+
+
+
+#home-section1-box2{
+    display: flex;
+    justify-content: space-around;
+}
+
+
+
+
+#home-section2{
+    padding-top: 30px;
+}
+

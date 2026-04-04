@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    --bg-card: #1A1B24;
+    /*
+    --bg-body: #fafafb;
+    --bg-body: linear-gradient(to top, #07080f, #121529);
+    --bg-body: linear-gradient(to top, #475154, #272f30);
+     */
+    --bg-body: linear-gradient(to top, #3A4154, #232330);
+
+
+    --color-text: #fff;
+    --light-blue: #5ED3EC;
+    --get-pro: #0FFC03;
+    --error: #FA020F;
+    --width-sidebar: 200px
+}
+
+* {
+    margin:0;
+    padding:0;
+    color: #fff9;
+}
+
+#data-colorschema{
+    position:absolute;
+    top :0;
+    visibility: hidden;
+}
+
+body {
+    /*
+    font-family: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+
+    */
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+    font-size: 15px;
+    overflow:hidden;
+
+}
+
+#app {
+    display: grid;
+    grid-template-columns: 200px 400px;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+#app[data-colorschema="light"]{background: #fafafb;}
+#app[data-colorschema="dark"]{background: var(--bg-body);}
+
+#page-container{
+    width:calc(100vw - var(--width-sidebar))
+
+}
+
+#page {
+    padding: 20px;
+}
+
+/* CONFIG PAGES */
+.page-documents, .page-models {
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Buttons */
+.btn {padding: 5px 8px; border-radius: 5px;background:transparent;cursor:pointer;transition:300ms}
+
+.btn-primary {border: 1px solid var(--light-blue); color: var(--light-blue)}
+.btn-error {border: 1px solid var(--error); color: var(--error)}
+.btn-success {border: 1px solid var(--get-pro); color: var(--get-pro)}
+
+.btn-primary:hover {background: var(--light-blue); color: #fff}
+.btn-error:hover {background: var(--error); color: #fff}
+.btn-success:hover {background: var(--get-pro); color: #fff}
