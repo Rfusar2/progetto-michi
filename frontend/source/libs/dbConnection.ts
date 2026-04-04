@@ -2,6 +2,37 @@ type DBQuery = {
     name: "storehouse" | "orders" | "customers";
 }
 
+type ItemCustomer = {
+    id: number;
+    name: string;
+    surname: string;
+    address: string;
+}
+type ItemOrderDetails = {
+    quantity: number;
+    product: number;
+    description: string;
+}
+type ItemOrder = {
+    id: number;
+    name: string;
+    customer: number;
+    details: ItemOrderDetails;
+}
+type ItemStoreHouseMaterial = {
+    id: number;
+    name: string;
+    blocked: boolean;
+}
+type ItemStoreHouseProduct = {
+    id: number;
+    status: string;
+    materials: ItemStoreHouseMaterial;
+}
+type StoreHouse = {
+    materials: ItemStoreHouseMaterial[];
+    product: ItemStoreHouseProduct[];
+}
 
 class HandlerConnection {
     constructor(){

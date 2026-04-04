@@ -16,9 +16,18 @@ class Routes {
 
         //*QUERY DB
         await this.db.ready;
-        const orders = this.db.tables.orders;
-        const materials = this.db.tables.storehouse.materials;
-        const customers = this.db.tables.customers;
+        const storehouse = this.db.tables.storehouse as StoreHouse;
+        const materials = storehouse.materials;
+
+        const customers = this.db.tables.customers as ItemCustomer[];
+        const orders = this.db.tables.orders as ItemOrder[];
+    
+        const options_customers = customers
+            .map((e:ItemCustomer)=>new Option(e.name, String(e.id)));
+        
+        const options_materials = materials
+            .filter((e:ItemStoreHouseMaterial)=>!e.blocked)
+            .map((e:ItemOrder)=>new Option(e.name, String(e.id)));
 
         //*DATA ELEMENT
         const cards = [
@@ -55,26 +64,38 @@ class Routes {
                     inputs:[
                         new ConfigModelInput({
                             props: {
-                                placeholder:"TAG Ordine", 
+                                placeholder:"Nome Ordine", 
                                 name:"name",
                             }
                         }),
                         new ConfigModelInput({
+                            label:"Cliente",
+                            tag: "select",
+                            options: options_customers,
                             props: {
-                                placeholder:"Cliente",
                                 name:"customer",
                             }
                         }),
                         new ConfigModelInput({
+                            label:"Prodotto",
+                            tag: "select",
+                            options: options_materials,
                             props: {
-                                placeholder:"Prodotto", 
-                                name:"product",
+                                name:"material",
                             }
                         }),
                         new ConfigModelInput({
                             props: {
                                 placeholder:"Quantita",
                                 name:"quantity",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            label:"Status",
+                            tag: "select",
+                            options: [new Option("Attesa", "0"), new Option("Working", "1")],
+                            props: {
+                                name:"description",
                             }
                         }),
                         new ConfigModelInput({

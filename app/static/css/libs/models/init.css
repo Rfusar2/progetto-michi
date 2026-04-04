@@ -147,3 +147,21 @@
     gap: 30px;
     padding: 20px;
 }
+
+.model-input-select > label {
+
+}
+.model-input-select > select {
+    margin-left: 20px;
+    color: #fff;
+    background: var(--bg-card);
+    border: 1px solid #fff2;
+    border-radius: 5px;
+    padding: 5px;
+    outline: none;
+}
+
+.model-input-select > select > option {
+    color: #fff;
+    background: var(--bg-card);
+}
