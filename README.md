@@ -17,20 +17,16 @@ Esempio:
 ```json
 {
     "materials": [
-        {
-            "id": 0,
-            "name": "Pelle Coccodrillo"
-        },
-        {
-            "id": 1,
-            "name": "Pelle Mucca"
-        }
+        {"id": 0,"blocked": false,"name": "A"},
+        {"id": 1,"blocked": false,"name": "B"},
+        {"id": 2,"blocked": true,"name": "A"},
+        {"id": 3,"blocked": true,"name": "A"},
+        {"id": 4,"blocked": false,"name": "A"}
     ],
     "products": [
-        {
-            "id": 0,
-            "materials": [0, 1]
-        }
+        {"id": 0,"name":"A","status": 0, "materials": [0, 1]},
+        {"id": 1,"name":"B","status": 1, "materials": [2, 3]},
+        {"id": 2,"name":"C","status": 1, "materials": [4, 5, 6, 7]}
     ]
 }
 ```
