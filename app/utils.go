@@ -32,7 +32,9 @@ type ITEM_ORDER struct {
 type ITEM_STOREHOUSE_MATERIALS struct {
 	Id int `json:"id"`
 	Name string `json:"name"`
-	Blocked bool `json:"blocked"`
+	Free int `json:"free"`
+	Blocked int `json:"blocked"`
+
 }
 type ITEM_STOREHOUSE_PRODUCT struct {
 	Id int `json:"id"`
@@ -153,77 +155,91 @@ func API_CUSTOMERS_ADD(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func API_ORDERS_ADD(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Metodo non consentito", http.StatusMethodNotAllowed)
-		return
-	}
-	data, err := GET_STOREHOUSE()
-	if err != nil { http.Error(w, err.Error(), 500);return}
-
-	var input ITEM_
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "JSON non valido", 415)
-		return
-	}
-
-	//Genera ID
-	var lastID int
-	if len(data) > 0 {
-		lastID = data[len(data)-1].Id
-	}
-
-	detailsOrder := ITEM_ORDER_DETAILS{
-		Quantity:    input.Details.Quantity,
-		Product:     input.Details.Product,
-		Description: input.Details.Description,
-	}
-	newOrder := ITEM_ORDER{
-		Id:       lastID + 1,
-		Name:     input.Name,
-		Customer: input.Customer,
-		Details:  detailsOrder,
-	}
-	data = append(data, newOrder)
-
-	//Save
-	file, err := json.MarshalIndent(data, "", "  ")
-	if err != nil { http.Error(w, err.Error(), 500);return}
-
-
-	if err := os.WriteFile("app/database/orders.json", file, 0644); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	//Response
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(newOrder)
-}
+//func API_ORDERS_ADD(w http.ResponseWriter, r *http.Request) {
+//	if r.Method != http.MethodPost {
+//		http.Error(w, "Metodo non consentito", http.StatusMethodNotAllowed)
+//		return
+//	}
+//	data, err := GET_STOREHOUSE()
+//	if err != nil { http.Error(w, err.Error(), 500);return}
+//
+//	var input ITEM_
+//	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+//		http.Error(w, "JSON non valido", 415)
+//		return
+//	}
+//
+//	//Genera ID
+//	var lastID int
+//	if len(data) > 0 {
+//		lastID = data[len(data)-1].Id
+//	}
+//
+//	detailsOrder := ITEM_ORDER_DETAILS{
+//		Quantity:    input.Details.Quantity,
+//		Product:     input.Details.Product,
+//		Description: input.Details.Description,
+//	}
+//	newOrder := ITEM_ORDER{
+//		Id:       lastID + 1,
+//		Name:     input.Name,
+//		Customer: input.Customer,
+//		Details:  detailsOrder,
+//	}
+//	data = append(data, newOrder)
+//
+//	//Save
+//	file, err := json.MarshalIndent(data, "", "  ")
+//	if err != nil { http.Error(w, err.Error(), 500);return}
+//
+//
+//	if err := os.WriteFile("app/database/orders.json", file, 0644); err != nil {
+//		http.Error(w, err.Error(), 500)
+//		return
+//	}
+//
+//	//Response
+//	w.Header().Set("Content-Type", "application/json")
+//	json.NewEncoder(w).Encode(newOrder)
+//}
 
 func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Metodo non consentito", 415)
+		http.Error(w, "{\"err\": \"solo metodo POST\"}", 415)
 		return
 	}
 	data, err := GET_STOREHOUSE()
 	if err != nil { http.Error(w, err.Error(), 500);return}
 
-	var input ITEM_STOREHOUSE
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "JSON non valido", 415)
+	var updateMaterial ITEM_STOREHOUSE_MATERIALS
+	if err := json.NewDecoder(r.Body).Decode(&updateMaterial); err != nil {
+		http.Error(w, "{\"err\": \"Parsing JSON Error\"}", 415)
 		return
 	}
 
-	//Genera ID
-	var lastID int
-	if len(data) > 0 {
-		lastID = data[len(data)-1].Id
+	if updateMaterial.Id != -1 {
+		for i, d := range data.Materials {
+			if d.Id == updateMaterial.Id {
+				data.Materials[i].Free += 1
+				updateMaterial = data.Materials[i]
+			}
+		}
+
+	} else {
+		//*Aggiungi il nuovo materiale se non esiste
+		var lastID int
+		if len(data.Materials) > 0 {
+			lastID = data.Materials[len(data.Materials)-1].Id
+		}
+		newMaterial := ITEM_STOREHOUSE_MATERIALS{
+			Id:      lastID+1,
+			Name:    updateMaterial.Name,
+			Free:    1,
+			Blocked: 0,
+		}
+		data.Materials = append(data.Materials, newMaterial)
 	}
 
-	//TODO AGGIUNGERE PARSER
-
-	data = append(data, newOrder)
 
 	//Save
 	file, err := json.MarshalIndent(data, "", "  ")
@@ -237,5 +253,5 @@ func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
 
 	//Response
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(newOrder)
+	json.NewEncoder(w).Encode(updateMaterial)
 }

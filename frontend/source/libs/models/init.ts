@@ -13,36 +13,35 @@ type ConfigModelInputProps = {
 class ConfigModelInput {
     obj: HTMLElement;
     status = false;
+    input: HTMLInputElement;
     constructor({props, tag, options, label}:ConfigModelInputProps){
         this.obj = new TAG_HTML(tag ? tag : "input").props(props).obj
+        this.input = this.obj
         switch(tag){
             case "select": 
                 if(options) { this.obj.append(...options);} break; 
         }
         if(label){
             const input = this.obj;
-            const e = new TAG_HTML("div").class(["model-input-select"]).obj
+            this.input = input
+            const container = new TAG_HTML("div").class(["model-input-select"]).obj
             const name_input = new TAG_HTML("label").props({textContent: label}).obj
-            e.append(name_input, input)
-            this.obj = e
+            container.append(name_input, input)
+            this.obj = container
         }
     }
 }
 
-type ConfigModelConnection = {
-    endpoint: string;
-    method: string;
-}
 
 type ConfigModelProps = {
-    conn: ConfigModelConnection;
+    conn: ()=>Promise<void>;
     type: ConfigModelTypes;
     title: string;
     inputs: ConfigModelInput[];
 }
 
 class ConfigModel {
-    conn: ConfigModelConnection;
+    conn: ()=>Promise<void>;
     type: ConfigModelTypes;
     title: string;
     inputs: ConfigModelInput[];
@@ -132,10 +131,9 @@ class Model {
         }
         const INPUTS = this.settings.inputs;
         for(let i = 0; i < INPUTS.length; i++){
-            console.log(boxies[i], INPUTS[i].obj)
             const outOfRange = i >= this.max_inputs-1;
             if(outOfRange) { break; }
-            this.inputs.push(INPUTS[i].obj);
+            this.inputs.push(INPUTS[i].input);
             boxies[i].append(INPUTS[i].obj);
         }
     }
@@ -148,30 +146,11 @@ class Model {
     }
 
     getEvents(){
-        this.btn_send.addEventListener("click", async (e)=>{
+        this.btn_send.addEventListener("click", async(e)=>{
             e.preventDefault()
-            const body: Record<string, unknown> = {};
-            
-            for(const input of this.inputs as HTMLInputElement[]){ body[input.name] = input.value }
-
-            console.log(this.settings)
-            const conn = this.settings.conn
-            let res = await fetch(conn.endpoint, {
-                method: conn.method,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body)
-            })
-            if(res.status == 200){
-                new Popup({
-                    type:"right",
-                    text: "Cliente Aggiunto",
-                    status: ConfigPopupStatus.OK
-                })
-                console.log("UTENTE AGGIUNTO: "+await res.json())
-            }
+            this.settings.conn(this.inputs)
         });
+
         this.btn_close.addEventListener("click", (e)=>{e.preventDefault();this.close(false)});
     }
 

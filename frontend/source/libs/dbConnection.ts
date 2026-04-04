@@ -22,7 +22,8 @@ type ItemOrder = {
 type ItemStoreHouseMaterial = {
     id: number;
     name: string;
-    blocked: boolean;
+    free: number;
+    blocked: number;
 }
 type ItemStoreHouseProduct = {
     id: number;
@@ -32,7 +33,7 @@ type ItemStoreHouseProduct = {
 }
 type StoreHouse = {
     materials: ItemStoreHouseMaterial[];
-    product: ItemStoreHouseProduct[];
+    products: ItemStoreHouseProduct[];
 }
 
 class HandlerConnection {}

@@ -18,5 +18,6 @@ var percorsi = []Percorso{
     {route: "/db/customers/get",  f: API_CUSTOMERS_FULL,},
 
     {route: "/db/customers/add",  f: API_CUSTOMERS_ADD,},
-    {route: "/db/orders/add",  f: API_ORDERS_ADD,},
+    {route: "/db/storehouse/materials/add",  f: API_MATERIAL_ADD,},
+    //{route: "/db/orders/add",  f: API_ORDERS_ADD,},
 }

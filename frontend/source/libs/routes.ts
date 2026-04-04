@@ -29,8 +29,7 @@ class Routes {
             .map((e:ItemCustomer)=>new Option(e.name, String(e.id)));
         
         const options_products = products
-            .filter((e:ItemStoreHouseMaterial)=>!e.blocked)
-            .map((e:ItemOrder)=>new Option(e.name, String(e.id)));
+            .map((e:ItemStoreHouseProduct)=>new Option(e.name, String(e.id)));
 
         const names_material = new Set<string>();
         storehouse.materials.filter((e:ItemStoreHouseMaterial)=>names_material.add(e.name))
@@ -43,7 +42,32 @@ class Routes {
                 title: "Magazzino", 
                 content: String(materials.length), 
                 form: {
-                    conn:{ endpoint: "/db/storehouse/add", method: "POST" },
+                    conn: async (data)=>{
+                        const isNew = data[1].value!="";
+                        const body = {
+                            id: isNew ? -1 : Number(data[0].value)
+                            name: isNew ? data[1].value : data[0].selectedOptions[0].text,
+                            free: Number(data[2].value)
+                            blocked: 0,
+                        }
+                        //console.log(body)
+
+                        let res = await fetch("/db/storehouse/materials/add", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(body)
+                        })
+
+                        if(res.status == 200){
+                            new Popup({type:"right", text: "Materiale Aggiunto", status: ConfigPopupStatus.OK })
+                            console.log(await res.json())
+                        }
+                        else {
+                            new Popup({type:"right", text: "Materiale Non Aggiunto", status: ConfigPopupStatus.KO })
+                            console.log("Materiale Aggiunto: "+await res.text())
+
+                        }
+                    },
                     title: "Aggiungi item",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
@@ -56,18 +80,16 @@ class Routes {
                             }
                         }),
                         new ConfigModelInput({
-                            label:"Bloccato",
-                            tag: "select",
-                            options: [new Option("Bloccato", "true"), new Option("Disponibile", "false")],
                             props: {
-                                placeholder:"Quantita",
-                                name:"quantity",
+                                placeholder:"Nuovo Materiale ?",
+                                name:"new-material",
                             }
                         }),
                         new ConfigModelInput({
                             props: {
                                 placeholder:"Quantita",
-                                name:"quantity",
+                                name:"free",
+                                type: "number",
                             }
                         }),
                     ]
