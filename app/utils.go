@@ -21,6 +21,7 @@ type ITEM_ORDER_DETAILS struct {
 	Description int `json:"description"`
 }
 type ITEM_ORDER struct {
+	Id int `json:"id"`
 	Name string `json:"name"`
 	Customer int `json:"customer"`
 	Details ITEM_ORDER_DETAILS `json:"customer"`
@@ -97,5 +98,5 @@ func API_CUSTOMERS(w http.ResponseWriter, r *http.Request){
 
 //* FRONTEND
 func MAIN(w http.ResponseWriter, r *http.Request) { 
-	http.ServeFile(w, r, "frontend/index.html") 
+	http.ServeFile(w, r, "app/index.html") 
 }
