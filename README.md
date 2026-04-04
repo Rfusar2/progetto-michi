@@ -17,16 +17,13 @@ Esempio:
 ```json
 {
     "materials": [
-        {"id": 0,"blocked": false,"name": "A"},
-        {"id": 1,"blocked": false,"name": "B"},
-        {"id": 2,"blocked": true,"name": "A"},
-        {"id": 3,"blocked": true,"name": "A"},
-        {"id": 4,"blocked": false,"name": "A"}
+        {"id": 0, "name": "Cuoio", "free": 22, "blocked": 5},
+        {"id": 1, "name": "Pelle di Mucca", "free": 10, "blocked": 5 },
     ],
     "products": [
-        {"id": 0,"name":"A","status": 0, "materials": [0, 1]},
-        {"id": 1,"name":"B","status": 1, "materials": [2, 3]},
-        {"id": 2,"name":"C","status": 1, "materials": [4, 5, 6, 7]}
+        {"id": 0,"name":"cuoio + mucca","status": 0, "materials": [0, 1]},
+        {"id": 1,"name":"solo cuoio","status": 1, "materials": [0]},
+        {"id": 2,"name":"solo mucca","status": 1, "materials": [1]}
     ]
 }
 ```
@@ -44,17 +41,17 @@ Esempio:
 ```json
 [
     {
-        "id": 0,
-        "name": "#TITOLOORDINE#",
-        "customer": "#IDCLIENTE#",
+        "id": 1,
+        "name": "Titolo Ordine",
+        "customer": 0,
         "details": [
             {
                 "quantity": 5,
-                "product": "#NOMEPRODOTTO#",
-                "description": "#DESCRIZIONEPRODOTTO#"
+                "product": 1,
+                "description": ""
             }
         ]
-    }
+    },
 ]
 ```
 

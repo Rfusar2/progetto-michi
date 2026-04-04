@@ -220,7 +220,7 @@ func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
 	if updateMaterial.Id != -1 {
 		for i, d := range data.Materials {
 			if d.Id == updateMaterial.Id {
-				data.Materials[i].Free += 1
+				data.Materials[i].Free += updateMaterial.Free
 				updateMaterial = data.Materials[i]
 			}
 		}
@@ -234,7 +234,7 @@ func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
 		newMaterial := ITEM_STOREHOUSE_MATERIALS{
 			Id:      lastID+1,
 			Name:    updateMaterial.Name,
-			Free:    1,
+			Free:    updateMaterial.Free,
 			Blocked: 0,
 		}
 		data.Materials = append(data.Materials, newMaterial)

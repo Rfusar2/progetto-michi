@@ -34,13 +34,16 @@ class Routes {
         const names_material = new Set<string>();
         storehouse.materials.filter((e:ItemStoreHouseMaterial)=>names_material.add(e.name))
         const options_materials = Array.from(names_material).map((e:string, i:number)=>new Option(e, String(i)))
+
+        let n_materials = 0
+        materials.forEach((e:ItemStoreHouseMaterial)=>n_materials+=e.free)
         
 
         //*DATA CARDS
         const cards = [
             {
-                title: "Magazzino", 
-                content: String(materials.length), 
+                title: "Materiali disponibili", 
+                content: String(n_materials), 
                 form: {
                     conn: async (data)=>{
                         const isNew = data[1].value!="";
