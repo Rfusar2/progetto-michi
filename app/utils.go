@@ -10,6 +10,7 @@ import (
 //============================== TYPES TABLES ==============================
 //* customer
 type ITEM_CUSTOMER struct {
+	Id int `json:"id"`
 	Name string `json:"name"`
 	Surname string `json:"surname"`
 	Address string `json:"address"`
@@ -77,28 +78,74 @@ func GET_CUSTOMERS() ([]ITEM_CUSTOMER, error) {
 
 
 
-func API_STOREHOUSE(w http.ResponseWriter, r *http.Request){
+//============================== ROUTES ==============================
+//* FRONTEND
+func MAIN(w http.ResponseWriter, r *http.Request) { 
+	http.ServeFile(w, r, "app/index.html") 
+}
+
+//* BACKEND
+func API_STOREHOUSE_FULL(w http.ResponseWriter, r *http.Request){
 	data, err := GET_STOREHOUSE()
 	if err != nil { http.Error(w, err.Error(), 500)}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
-func API_ORDERS(w http.ResponseWriter, r *http.Request){
+func API_ORDERS_FULL(w http.ResponseWriter, r *http.Request){
 	data, err := GET_ORDERS()
 	if err != nil { http.Error(w, err.Error(), 500)}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
-func API_CUSTOMERS(w http.ResponseWriter, r *http.Request){
+func API_CUSTOMERS_FULL(w http.ResponseWriter, r *http.Request){
 	data, err := GET_CUSTOMERS()
 	if err != nil { http.Error(w, err.Error(), 500)}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
+func API_CUSTOMERS_ADD(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Metodo non consentito", http.StatusMethodNotAllowed)
+		return
+	}
+	data, err := GET_CUSTOMERS()
+	if err != nil { http.Error(w, err.Error(), 500);return}
 
-//* FRONTEND
-func MAIN(w http.ResponseWriter, r *http.Request) { 
-	http.ServeFile(w, r, "app/index.html") 
+	var input ITEM_CUSTOMER
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "JSON non valido", 415)
+		return
+	}
+
+	//Genera ID
+	var lastID int
+	if len(data) > 0 {
+		lastID = data[len(data)-1].Id
+	}
+
+	newCustomer := ITEM_CUSTOMER{
+		Id:      lastID + 1,
+		Name:    input.Name,
+		Surname: input.Surname,
+		Address: input.Address,
+	}
+	data = append(data, newCustomer)
+
+	//Save
+	file, err := json.MarshalIndent(data, "", "  ")
+	if err != nil { http.Error(w, err.Error(), 500);return}
+
+
+	if err := os.WriteFile("app/database/customers.json", file, 0644); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	//Response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newCustomer)
 }
+
+

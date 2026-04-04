@@ -12,8 +12,11 @@ type Percorso struct{
 //DEFINIZIONI ROUETS
 var percorsi = []Percorso{
     {route: "/",  f: MAIN,},
-    {route: "/db/storehouse", f: API_STOREHOUSE,},
-    {route: "/db/orders",     f: API_ORDERS,},
-    {route: "/db/customers",  f: API_CUSTOMERS,},
-    //{route: "/dv/ordini", f: API_DB_MAGAZZINO,},
+    
+	{route: "/db/storehouse/get", f: API_STOREHOUSE_FULL,},
+    {route: "/db/orders/get",     f: API_ORDERS_FULL,},
+    {route: "/db/customers/get",  f: API_CUSTOMERS_FULL,},
+
+
+    {route: "/db/customers/add",  f: API_CUSTOMERS_ADD,},
 }

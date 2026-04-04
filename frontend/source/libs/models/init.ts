@@ -16,17 +16,25 @@ class ConfigModelInput {
     }
 }
 
+type ConfigModelConnection = {
+    endpoint: string;
+    method: string;
+}
+
 type ConfigModelProps = {
+    conn: ConfigModelConnection;
     type: ConfigModelTypes;
     title: string;
     inputs: ConfigModelInput[];
 }
 
 class ConfigModel {
+    conn: ConfigModelConnection;
     type: ConfigModelTypes;
     title: string;
     inputs: ConfigModelInput[];
-    constructor({type, title, inputs}: ConfigModelProps){
+    constructor({conn, type, title, inputs}: ConfigModelProps){
+        this.conn = conn
         this.type = type
         this.title = title,
         this.inputs = inputs
@@ -41,16 +49,13 @@ class Model {
     container_inputs = new TAG_HTML("main").obj;
     obj: HTMLElement;
     _type: string;
+    inputs: HTMLElement[] = [];
 
     header = new TAG_HTML("header").obj;
     footer = new TAG_HTML("footer").obj;
-    btn_close = new TAG_HTML("button")
-            .id("btn-close")
-            .props({textContent: "Cancella"}).obj;
+    btn_close = new TAG_HTML("button").id("btn-close").props({textContent: "Cancella"}).obj;
+    btn_send = new TAG_HTML("button").id("btn-send").props({textContent: "Conferma"}).obj;
 
-    btn_send = new TAG_HTML("button")
-            .id("btn-send")
-            .props({textContent: "Conferma"}).obj;
 
     constructor(settings:ConfigModelProps){
         this.settings = new ConfigModel(settings);
@@ -83,7 +88,7 @@ class Model {
     }
 
      createModel():HTMLElement{
-        const container = new TAG_HTML("div").id("container-model").obj;
+        const container = new TAG_HTML("form").id("container-model").obj;
         const model = new TAG_HTML("div")
              .id("model-"+this._type)
              .class(["model"]).obj;
@@ -117,6 +122,7 @@ class Model {
             console.log(boxies[i], INPUTS[i].obj)
             const outOfRange = i >= this.max_inputs-1;
             if(outOfRange) { break; }
+            this.inputs.push(INPUTS[i].obj);
             boxies[i].append(INPUTS[i].obj);
         }
     }
@@ -129,7 +135,25 @@ class Model {
     }
 
     getEvents(){
-        this.btn_close.addEventListener("click", ()=>this.close(false));
+        this.btn_send.addEventListener("click", async (e)=>{
+            e.preventDefault()
+            const body: Record<string, unknown> = {};
+            
+            for(const input of this.inputs as HTMLInputElement[]){ body[input.name] = input.value }
+
+            console.log(this.settings)
+            const conn = this.settings.conn
+            let res = await fetch(conn.endpoint, {
+                method: conn.method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body)
+            })
+            res = await res.json()
+            console.log(res)
+        });
+        this.btn_close.addEventListener("click", (e)=>{e.preventDefault();this.close(false)});
     }
 
     close(background=true, timeout=3000){

@@ -31,7 +31,7 @@ class MyDB {
     }
 
     async load(query: DBQuery){
-        let res = await fetch(`/db/${query.name}`, {method:"GET"})
+        let res = await fetch(`/db/${query.name}/get`, {method:"GET"})
         res = await res.json();
         this.tables[query.name] = res;
     }

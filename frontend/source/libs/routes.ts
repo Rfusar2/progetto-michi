@@ -25,9 +25,8 @@ class Routes {
             {
                 title: "Magazzino", 
                 content: String(materials.length), 
-                note: "apr-mag",
                 form: {
-                    endpoint: "#",
+                    conn:{ endpoint: "/db/storehouse/add", method: "POST" },
                     title: "Aggiungi item",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
@@ -49,9 +48,8 @@ class Routes {
             {
                 title: "Ordini", 
                 content: String(orders.length), 
-                note: "apr-mag",
                 form: {
-                    endpoint: "#",
+                    conn:{ endpoint: "/db/orders/add", method: "POST" },
                     title: "Aggiungi ordine",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
@@ -79,9 +77,8 @@ class Routes {
             {
                 title: "Clienti", 
                 content: String(customers.length), 
-                note: "apr-mag",
                 form: {
-                    endpoint: "#",
+                    conn:{ endpoint: "/db/customers/add", method: "POST" },
                     title: "Aggiungi cliente",
                     model: ConfigModelTypes.CENTER,
                     inputs:[

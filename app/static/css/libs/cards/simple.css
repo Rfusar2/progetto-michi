@@ -26,11 +26,13 @@
     padding: 10px;
 }
 .card-details > main {
+    position: relative;
     padding: 10px;
     display: grid;
     grid-template-columns: 30% 70%;
 }
 .card-details > footer {
+    position: relative;
     padding-right: 10px;
     text-align: right;
     font-size: .7rem;

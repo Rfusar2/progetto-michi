@@ -5,7 +5,7 @@ enum ConfigCardStyle {
 }
 
 type ConfigCardForm = {
-    endpoint: string;
+    conn: ConfigModelConnection;
     title: string;
     model: ConfigModelTypes;
     inputs: ConfigModelInput[]
@@ -25,7 +25,7 @@ class Card {
     parent: HTMLElement;
     obj = new TAG_HTML("div").class(["card", "card-details"]).attr({colorschema:"dark"}).obj;
     btn_add = new TAG_HTML("button").class(["btn", "btn-primary", "btn-card-add"]).props({textContent: "+"}).obj;
-    btn_change_pag = new TAG_HTML("button").class(["btn", "btn-warning", "btn-card-changepage"]).props({textContent: "?"}).obj;
+    btn_change_page = new TAG_HTML("button").class(["btn", "btn-warning", "btn-card-changepage"]).props({textContent: "?"}).obj;
     
     title: string;
     style: ConfigCardStyle;
@@ -62,7 +62,7 @@ class Card {
             const note = new TAG_HTML("span").class(["card-details-note"]).props({textContent: this.note}).attr({colorschema:"dark"}).obj;
             footer.append(note);
         }
-        footer.append(this.btn_change_pag);
+        footer.append(this.btn_change_page);
 
         this.obj.append(header, main, footer);
     }
@@ -71,6 +71,7 @@ class Card {
         if(this.form){
             this.btn_add.addEventListener("click", ()=>{
                 new Model({
+                    conn: this.form!.conn,
                     type: this.form!.model,
                     title: this.form!.title,
                     inputs: this.form!.inputs
