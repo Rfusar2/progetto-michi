@@ -8,7 +8,7 @@ type ConfigCardForm = {
     endpoint: string;
     title: string;
     model: ConfigModelTypes;
-    inputs: HTMLElement[]
+    inputs: ConfigModelInput[]
 }
 
 type ConfigCardProps = {
@@ -25,6 +25,7 @@ class Card {
     parent: HTMLElement;
     obj = new TAG_HTML("div").class(["card", "card-details"]).attr({colorschema:"dark"}).obj;
     btn_add = new TAG_HTML("button").class(["btn", "btn-primary", "btn-card-add"]).props({textContent: "+"}).obj;
+    btn_change_pag = new TAG_HTML("button").class(["btn", "btn-warning", "btn-card-changepage"]).props({textContent: "?"}).obj;
     
     title: string;
     style: ConfigCardStyle;
@@ -57,8 +58,11 @@ class Card {
         )
         main.append(...main_containers);
         
-        const note = new TAG_HTML("span").class(["card-details-note"]).props({textContent: this.note}).attr({colorschema:"dark"}).obj;
-        footer.append(note);
+        if(this.note){
+            const note = new TAG_HTML("span").class(["card-details-note"]).props({textContent: this.note}).attr({colorschema:"dark"}).obj;
+            footer.append(note);
+        }
+        footer.append(this.btn_change_pag);
 
         this.obj.append(header, main, footer);
     }
@@ -67,9 +71,9 @@ class Card {
         if(this.form){
             this.btn_add.addEventListener("click", ()=>{
                 new Model({
-                    type: this.form.model,
-                    title: this.form.title,
-                    inputs: this.form.inputs
+                    type: this.form!.model,
+                    title: this.form!.title,
+                    inputs: this.form!.inputs
                 })
             })
         }

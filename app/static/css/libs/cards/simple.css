@@ -54,3 +54,8 @@
     top:15px;
     right: 15px;
 }
+.card .btn-card-changepage {
+    position:absolute;
+    bottom:15px;
+    right: 15px;
+}

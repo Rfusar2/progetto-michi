@@ -101,11 +101,11 @@ class HeaderTable {
     }
     
     getEvents(){
-        this.title.addEventListener("click", ()=>new Model({
-            type: ConfigModelTypes.RIGHT,
-            title: "Impostazioni",
-            inputs: [new TAG_HTML("input").obj as HTMLInputElement ],
-        }));
+        //this.title.addEventListener("click", ()=>new Model({
+        //    type: ConfigModelTypes.RIGHT,
+        //    title: "Impostazioni",
+        //    inputs: [new TAG_HTML("input").obj as HTMLInputElement ],
+        //}));
     }
 }
 

@@ -20,10 +20,6 @@ class Routes {
         const materials = this.db.tables.storehouse.materials;
         const customers = this.db.tables.customers;
 
-        const i1 = new ConfigModelInput({name:"artcode"});
-        const i2 = new ConfigModelInput({name:"artcode"});
-        const i3 = new ConfigModelInput({name:"artcode"});
-
         //*DATA ELEMENT
         const cards = [
             {
@@ -34,7 +30,20 @@ class Routes {
                     endpoint: "#",
                     title: "Aggiungi item",
                     model: ConfigModelTypes.CENTER,
-                    inputs:[i1, i2, i3]
+                    inputs:[
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Nome Prodotto", 
+                                name:"name",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"materiali",
+                                name:"materiali",
+                            }
+                        }),
+                    ]
                 }
             },
             {
@@ -45,7 +54,26 @@ class Routes {
                     endpoint: "#",
                     title: "Aggiungi ordine",
                     model: ConfigModelTypes.CENTER,
-                    inputs:[i1, i1]
+                    inputs:[
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"TAG Ordine", 
+                                name:"name",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Cliente",
+                                name:"materiali",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Prodotto", 
+                                name:"materiali",
+                            }
+                        }),
+                    ]
                 }
             },
             {
@@ -56,19 +84,32 @@ class Routes {
                     endpoint: "#",
                     title: "Aggiungi cliente",
                     model: ConfigModelTypes.CENTER,
-                    inputs:[i1, i1]
+                    inputs:[
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Nome Cliente", 
+                                name:"name",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Cognome Cliente", 
+                                name:"surname",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Indirizzo Cliente",
+                                name:"address",
+                            }
+                        }),
+                    ]
                 }
             },
             {
-                title: "Clienti", 
-                content: String(materials.length), 
-                note: "apr-mag",
-                form: {
-                    endpoint: "#",
-                    title: "Aggiungi cliente",
-                    model: ConfigModelTypes.CENTER,
-                    inputs:[i1, i1]
-                }
+                title: "null", 
+                content: "", 
+                note: "",
             },
         ];
 

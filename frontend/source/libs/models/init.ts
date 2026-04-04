@@ -4,15 +4,15 @@ enum ConfigModelTypes {
 }
 
 type ConfigModelInputProps = {
-    type?: string;
-    name: string;
+    props: object;
+    tag?: string;
 }
 
 class ConfigModelInput {
     obj: HTMLElement;
     status = false;
-    constructor({tag, name}:ConfigModelInputProps){
-        this.obj = new TAG_HTML(tag ? tag : "input").props({name: name}).obj
+    constructor({props, tag}:ConfigModelInputProps){
+        this.obj = new TAG_HTML(tag ? tag : "input").props(props).obj
     }
 }
 
@@ -25,7 +25,7 @@ type ConfigModelProps = {
 class ConfigModel {
     type: ConfigModelTypes;
     title: string;
-    inputs: HTMLElement[];
+    inputs: ConfigModelInput[];
     constructor({type, title, inputs}: ConfigModelProps){
         this.type = type
         this.title = title,
