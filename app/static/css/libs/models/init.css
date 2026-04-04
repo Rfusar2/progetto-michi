@@ -123,8 +123,8 @@
 }
 
 #model-center {
-    width: calc(100vw - 200px);
-    height: calc(100vh - 200px);
+    width: 750px;
+    height: 400px;
     animation: model-center 500ms ease forwards;
     border: 1px solid #fff2;
     box-shadow: 2px 4px 6px #0004;

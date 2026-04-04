@@ -16,14 +16,18 @@ class MyDB {
         orders: [],
         customers: [],
     };
+    ready: Promise<void>;
 
     constructor(){
-        (async ()=>{
-            this.load({name: "storehouse"})
-            this.load({name: "orders"})
-            this.load({name: "customers"})
-    
-        })()
+        this.ready = this.init()
+    }
+
+    async init(){
+        await Promise.all([
+            await this.load({name: "storehouse"}),
+            await this.load({name: "orders"}),
+            await this.load({name: "customers"}),
+        ])
     }
 
     async load(query: DBQuery){
@@ -33,5 +37,3 @@ class MyDB {
     }
 }
 
-const database = new MyDB()
-console.log(database.tables)

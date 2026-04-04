@@ -31,9 +31,11 @@ type ITEM_ORDER struct {
 type ITEM_STOREHOUSE_MATERIALS struct {
 	Id int `json:"id"`
 	Name string `json:"name"`
+	Blocked bool `json:"blocked"`
 }
 type ITEM_STOREHOUSE_PRODUCT struct {
 	Id int `json:"id"`
+	Status int `json:"status"`
 	Materials []int `json:"materials"`
 }
 type STOREHOUSE struct {

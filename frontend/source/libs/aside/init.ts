@@ -1,12 +1,12 @@
+type RouteName = "project"
+
 type AsideItem = {
     text: string;
     href: string;
 }
 
 const LINKS_ASIDE: AsideItem[] = [
-    {text: "Listino", href: "#",},
-    {text: "Magazzino", href: "#",},
-    {text: "Ordini", href: "#",},
+    {text: "Progetti", href: "#",},
 ] 
 
 

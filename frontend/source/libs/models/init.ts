@@ -3,16 +3,29 @@ enum ConfigModelTypes {
     RIGHT
 }
 
+type ConfigModelInputProps = {
+    type?: string;
+    name: string;
+}
+
+class ConfigModelInput {
+    obj: HTMLElement;
+    status = false;
+    constructor({tag, name}:ConfigModelInputProps){
+        this.obj = new TAG_HTML(tag ? tag : "input").props({name: name}).obj
+    }
+}
+
 type ConfigModelProps = {
     type: ConfigModelTypes;
     title: string;
-    inputs: HTMLInputElement[];
+    inputs: ConfigModelInput[];
 }
 
 class ConfigModel {
     type: ConfigModelTypes;
     title: string;
-    inputs: HTMLInputElement[];
+    inputs: HTMLElement[];
     constructor({type, title, inputs}: ConfigModelProps){
         this.type = type
         this.title = title,
@@ -101,9 +114,10 @@ class Model {
         }
         const INPUTS = this.settings.inputs;
         for(let i = 0; i < INPUTS.length; i++){
-            const outOfRange = i >= this.max_inputs;
+            console.log(boxies[i], INPUTS[i].obj)
+            const outOfRange = i >= this.max_inputs-1;
             if(outOfRange) { break; }
-            boxies[i].append(INPUTS[i]);
+            boxies[i].append(INPUTS[i].obj);
         }
     }
 

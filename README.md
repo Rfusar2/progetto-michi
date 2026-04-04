@@ -48,7 +48,8 @@ Esempio:
 ```json
 [
     {
-        "name": "Titolo Ordine",
+        "id": 0,
+        "name": "#TITOLOORDINE#",
         "customer": "#IDCLIENTE#",
         "details": [
             {
