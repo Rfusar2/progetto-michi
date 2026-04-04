@@ -19,7 +19,7 @@ type ITEM_CUSTOMER struct {
 type ITEM_ORDER_DETAILS struct {
 	Quantity int `json:"quantity"`
 	Product int `json:"product"`
-	Description int `json:"description"`
+	Description string `json:"description"`
 }
 type ITEM_ORDER struct {
 	Id int `json:"id"`
@@ -84,6 +84,7 @@ func MAIN(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "app/index.html") 
 }
 
+//============================== GET ==============================
 //* BACKEND
 func API_STOREHOUSE_FULL(w http.ResponseWriter, r *http.Request){
 	data, err := GET_STOREHOUSE()
@@ -105,6 +106,8 @@ func API_CUSTOMERS_FULL(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(data)
 }
 
+
+//============================== PUT ==============================
 func API_CUSTOMERS_ADD(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Metodo non consentito", http.StatusMethodNotAllowed)
@@ -148,4 +151,52 @@ func API_CUSTOMERS_ADD(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newCustomer)
 }
 
+
+func API_ORDERS_ADD(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Metodo non consentito", http.StatusMethodNotAllowed)
+		return
+	}
+	data, err := GET_ORDERS()
+	if err != nil { http.Error(w, err.Error(), 500);return}
+
+	var input ITEM_ORDER
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "JSON non valido", 415)
+		return
+	}
+
+	//Genera ID
+	var lastID int
+	if len(data) > 0 {
+		lastID = data[len(data)-1].Id
+	}
+
+	detailsOrder := ITEM_ORDER_DETAILS{
+		Quantity:    input.Details.Quantity,
+		Product:     input.Details.Product,
+		Description: input.Details.Description,
+	}
+	newOrder := ITEM_ORDER{
+		Id:       lastID + 1,
+		Name:     input.Name,
+		Customer: input.Customer,
+		Details:  detailsOrder,
+	}
+	data = append(data, newOrder)
+
+	//Save
+	file, err := json.MarshalIndent(data, "", "  ")
+	if err != nil { http.Error(w, err.Error(), 500);return}
+
+
+	if err := os.WriteFile("app/database/orders.json", file, 0644); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	//Response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newOrder)
+}
 

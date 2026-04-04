@@ -130,6 +130,13 @@
     box-shadow: 2px 4px 6px #0004;
     border-radius: 7px;
 }
+
+
+#model-center  > main {
+    display: grid;
+    grid-template-columns: 33% 34% 33%;
+}
+
 #model-container-btns-center{
     display: grid;
     grid-template-columns: 50% 50%;

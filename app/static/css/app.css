@@ -9,6 +9,9 @@
      */
     --bg-body: linear-gradient(to top, #3A4154, #232330);
 
+    --yellow-text: #fcba03;
+
+
 
     --color-text: #fff;
     --light-blue: #5ED3EC;
@@ -76,7 +79,9 @@ body {
 .btn-primary {border: 1px solid var(--light-blue); color: var(--light-blue)}
 .btn-error {border: 1px solid var(--error); color: var(--error)}
 .btn-success {border: 1px solid var(--get-pro); color: var(--get-pro)}
+.btn-warning {border: 1px solid var(--yellow-text); color: var(--yellow-text)}
 
 .btn-primary:hover {background: var(--light-blue); color: #fff}
 .btn-error:hover {background: var(--error); color: #fff}
 .btn-success:hover {background: var(--get-pro); color: #fff}
+.btn-warning:hover {background: var(--yellow-text); color: #fff}

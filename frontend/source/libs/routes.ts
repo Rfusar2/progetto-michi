@@ -8,7 +8,7 @@ class Routes {
         this.main.classList.add(_class);
     }
 
-    async home(){
+    async dashboard(){
         this.init("page-listino");
         const [s1, s2] = ["section", "section"].map((e:string)=>new TAG_HTML(e).obj);
         this.main.append(s1, s2);
@@ -62,13 +62,25 @@ class Routes {
                         new ConfigModelInput({
                             props: {
                                 placeholder:"Cliente",
-                                name:"materiali",
+                                name:"customer",
                             }
                         }),
                         new ConfigModelInput({
                             props: {
                                 placeholder:"Prodotto", 
-                                name:"materiali",
+                                name:"product",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Quantita",
+                                name:"quantity",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Descrizione",
+                                name:"description",
                             }
                         }),
                     ]

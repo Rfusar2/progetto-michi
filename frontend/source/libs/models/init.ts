@@ -150,8 +150,14 @@ class Model {
                 },
                 body: JSON.stringify(body)
             })
-            res = await res.json()
-            console.log(res)
+            if(res.status == 200){
+                new Popup({
+                    type:"right",
+                    text: "Cliente Aggiunto",
+                    status: ConfigPopupStatus.OK
+                })
+                console.log("UTENTE AGGIUNTO: "+await res.json())
+            }
         });
         this.btn_close.addEventListener("click", (e)=>{e.preventDefault();this.close(false)});
     }
