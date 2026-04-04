@@ -18,18 +18,26 @@ class Routes {
         await this.db.ready;
         const storehouse = this.db.tables.storehouse as StoreHouse;
         const materials = storehouse.materials;
+        const products = storehouse.products;
+        console.log(this.db.tables)
 
         const customers = this.db.tables.customers as ItemCustomer[];
         const orders = this.db.tables.orders as ItemOrder[];
     
+        //* Filters
         const options_customers = customers
             .map((e:ItemCustomer)=>new Option(e.name, String(e.id)));
         
-        const options_materials = materials
+        const options_products = products
             .filter((e:ItemStoreHouseMaterial)=>!e.blocked)
             .map((e:ItemOrder)=>new Option(e.name, String(e.id)));
 
-        //*DATA ELEMENT
+        const names_material = new Set<string>();
+        storehouse.materials.filter((e:ItemStoreHouseMaterial)=>names_material.add(e.name))
+        const options_materials = Array.from(names_material).map((e:string, i:number)=>new Option(e, String(i)))
+        
+
+        //*DATA CARDS
         const cards = [
             {
                 title: "Magazzino", 
@@ -40,15 +48,26 @@ class Routes {
                     model: ConfigModelTypes.CENTER,
                     inputs:[
                         new ConfigModelInput({
+                            label:"Nome Prodotto", 
+                            tag: "select",
+                            options: options_materials,
                             props: {
-                                placeholder:"Nome Prodotto", 
                                 name:"name",
                             }
                         }),
                         new ConfigModelInput({
+                            label:"Bloccato",
+                            tag: "select",
+                            options: [new Option("Bloccato", "true"), new Option("Disponibile", "false")],
                             props: {
-                                placeholder:"materiali",
-                                name:"materiali",
+                                placeholder:"Quantita",
+                                name:"quantity",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Quantita",
+                                name:"quantity",
                             }
                         }),
                     ]
@@ -79,7 +98,7 @@ class Routes {
                         new ConfigModelInput({
                             label:"Prodotto",
                             tag: "select",
-                            options: options_materials,
+                            options: options_products,
                             props: {
                                 name:"material",
                             }

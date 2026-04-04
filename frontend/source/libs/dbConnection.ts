@@ -26,6 +26,7 @@ type ItemStoreHouseMaterial = {
 }
 type ItemStoreHouseProduct = {
     id: number;
+    name: string;
     status: string;
     materials: ItemStoreHouseMaterial;
 }
@@ -34,11 +35,7 @@ type StoreHouse = {
     product: ItemStoreHouseProduct[];
 }
 
-class HandlerConnection {
-    constructor(){
-        
-    }
-}
+class HandlerConnection {}
 
 class MyDB {
     handler = new HandlerConnection();

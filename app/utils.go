@@ -36,6 +36,7 @@ type ITEM_STOREHOUSE_MATERIALS struct {
 }
 type ITEM_STOREHOUSE_PRODUCT struct {
 	Id int `json:"id"`
+	Name string `json:"name"`
 	Status int `json:"status"`
 	Materials []int `json:"materials"`
 }
@@ -157,10 +158,10 @@ func API_ORDERS_ADD(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Metodo non consentito", http.StatusMethodNotAllowed)
 		return
 	}
-	data, err := GET_ORDERS()
+	data, err := GET_STOREHOUSE()
 	if err != nil { http.Error(w, err.Error(), 500);return}
 
-	var input ITEM_ORDER
+	var input ITEM_
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "JSON non valido", 415)
 		return
@@ -200,3 +201,41 @@ func API_ORDERS_ADD(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newOrder)
 }
 
+func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Metodo non consentito", 415)
+		return
+	}
+	data, err := GET_STOREHOUSE()
+	if err != nil { http.Error(w, err.Error(), 500);return}
+
+	var input ITEM_STOREHOUSE
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "JSON non valido", 415)
+		return
+	}
+
+	//Genera ID
+	var lastID int
+	if len(data) > 0 {
+		lastID = data[len(data)-1].Id
+	}
+
+	//TODO AGGIUNGERE PARSER
+
+	data = append(data, newOrder)
+
+	//Save
+	file, err := json.MarshalIndent(data, "", "  ")
+	if err != nil { http.Error(w, err.Error(), 500);return}
+
+
+	if err := os.WriteFile("app/database/storehouse.json", file, 0644); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	//Response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newOrder)
+}
