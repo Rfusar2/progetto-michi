@@ -14,13 +14,13 @@ type TableProps = {
     dimension: TableDimension;
     style: TableStyle;
     tools: SettingsTools;
-    conn?: ()=>Promise<[void, void]>;
+    conn?: ()=>Promise<Data[]>;
 }
 type ContentTableProps = {
     settings: SettingsTools;
     parent: HTMLElement;
     width_columns?: string;
-    conn?: ()=>Promise<[void, void]>;
+    conn?: ()=>Promise<Data[]>;
 }
 
 class SettingsTable {
@@ -157,7 +157,7 @@ class ContentTable {
     data: Data[];
     pages: Data[][];
     page: Data[];
-    conn: (()=>Promise<[void, void]>) | undefined;
+    conn?: ()=>Promise<Data[]>;
     //TODO fare enum
     action_names = {
         N_PAG: "n_pag",
@@ -184,7 +184,7 @@ class ContentTable {
     }
 
     async init(parent, width_columns) {
-        this.ready = await this.toScreenNameColumns()
+        await this.toScreenNameColumns()
 
         this.handlerWidthColumns(parent, width_columns)
         this.setContent(true)
@@ -307,7 +307,11 @@ class ContentTable {
     }
 
     async getDBData(){ 
-        if(this.conn) { this.data = await this.conn() as Data; }
+        if(this.conn) { 
+            const data = await this.conn();
+            console.log(data)
+            this.data = data
+        }
         //switch(this.dbName){
         //    case "full": this.data = EXAMPLE_DATA.full(); break;
         //    case "expired": this.data = EXAMPLE_DATA.expired(); break;
@@ -363,7 +367,7 @@ class Table {
 
     }
 
-    async loadContent({style, tools, conn}){
+    async loadContent({style, tools, conn}: {style:TableStyle, tools: SettingsTools, conn:()=>Promise<[void, void]> | undefined}){
         //console.log(this.table)
         await this.table.ready
         //console.log(this.table)

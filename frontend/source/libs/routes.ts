@@ -53,7 +53,7 @@ class Routes {
                             free: Number(data[2].value),
                             blocked: 0,
                         }
-                        console.log("OBJECT", body)
+                        //console.log("OBJECT", body)
 
                         let res = await fetch("/db/storehouse/materials/add", {
                             method: "POST",
@@ -74,7 +74,7 @@ class Routes {
                     model: ConfigModelTypes.CENTER,
                     inputs:[
                         new ConfigModelInput({
-                            label:"Nome Prodotto", 
+                            label:"Nome Materiale",
                             tag: "select",
                             options: options_materials,
                             props: {
