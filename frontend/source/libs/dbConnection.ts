@@ -64,5 +64,7 @@ class MyDB {
         res = await res.json();
         this.tables[query.name] = res;
     }
+
 }
 
+const DATABASE = new MyDB()

@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
-	_ "log"
+	"log"
     "net/http"
 )
 
@@ -217,8 +217,12 @@ func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
 	if updateMaterial.Id != -1 {
 		for i, d := range data.Materials {
+			//DEBUG
+			log.Printf("ID_frontend: %v; ID_db: %v", updateMaterial.Id, d.Id)
+			
 			if d.Id == updateMaterial.Id {
 				data.Materials[i].Free += updateMaterial.Free
 				updateMaterial = data.Materials[i]

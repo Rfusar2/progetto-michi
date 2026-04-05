@@ -34,14 +34,14 @@ class ConfigModelInput {
 
 
 type ConfigModelProps = {
-    conn: ()=>Promise<void>;
+    conn: (data:object)=>Promise<void>;
     type: ConfigModelTypes;
     title: string;
     inputs: ConfigModelInput[];
 }
 
 class ConfigModel {
-    conn: ()=>Promise<void>;
+    conn: (data:object)=>Promise<void>;
     type: ConfigModelTypes;
     title: string;
     inputs: ConfigModelInput[];

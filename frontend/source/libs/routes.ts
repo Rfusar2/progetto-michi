@@ -1,6 +1,6 @@
 class Routes {
     main = SELECT.one("#page");
-    db = new MyDB()
+    db = DATABASE
 
     init(_class: string){
         this.main.className = "";
@@ -19,7 +19,6 @@ class Routes {
         const storehouse = this.db.tables.storehouse as StoreHouse;
         const materials = storehouse.materials;
         const products = storehouse.products;
-        console.log(this.db.tables)
 
         const customers = this.db.tables.customers as ItemCustomer[];
         const orders = this.db.tables.orders as ItemOrder[];
@@ -31,9 +30,9 @@ class Routes {
         const options_products = products
             .map((e:ItemStoreHouseProduct)=>new Option(e.name, String(e.id)));
 
-        const names_material = new Set<string>();
-        storehouse.materials.filter((e:ItemStoreHouseMaterial)=>names_material.add(e.name))
-        const options_materials = Array.from(names_material).map((e:string, i:number)=>new Option(e, String(i)))
+        const map = new Map<number, { name: string; id: number }>();
+        storehouse.materials.forEach((e: ItemStoreHouseMaterial) => { map.set(e.id, { name: e.name, id: e.id });});
+        const options_materials = Array.from(map.values()).map((e) => new Option(e.name, String(e.id)));
 
         let n_materials = 0
         materials.forEach((e:ItemStoreHouseMaterial)=>n_materials+=e.free)
@@ -44,16 +43,17 @@ class Routes {
             {
                 title: "Materiali disponibili", 
                 content: String(n_materials), 
+                router: "materiali",
                 form: {
                     conn: async (data)=>{
                         const isNew = data[1].value!="";
                         const body = {
-                            id: isNew ? -1 : Number(data[0].value)
+                            id: isNew ? -1 : Number(data[0].value),
                             name: isNew ? data[1].value : data[0].selectedOptions[0].text,
-                            free: Number(data[2].value)
+                            free: Number(data[2].value),
                             blocked: 0,
                         }
-                        //console.log(body)
+                        console.log("OBJECT", body)
 
                         let res = await fetch("/db/storehouse/materials/add", {
                             method: "POST",
@@ -68,7 +68,6 @@ class Routes {
                         else {
                             new Popup({type:"right", text: "Materiale Non Aggiunto", status: ConfigPopupStatus.KO })
                             console.log("Materiale Aggiunto: "+await res.text())
-
                         }
                     },
                     title: "Aggiungi item",
@@ -101,8 +100,30 @@ class Routes {
             {
                 title: "Ordini", 
                 content: String(orders.length), 
+                router: "ordini",
                 form: {
-                    conn:{ endpoint: "/db/orders/add", method: "POST" },
+                    //TODO da finire
+                    conn: async (data)=>{
+                        const isNew = data[1].value!="";
+                        const body = {
+                        }
+                        console.log(data)
+
+                        //let res = await fetch("/db/orders/add", {
+                        //    method: "POST",
+                        //    headers: { "Content-Type": "application/json" },
+                        //    body: JSON.stringify(body)
+                        //})
+
+                        //if(res.status == 200){
+                        //    new Popup({type:"right", text: "Materiale Aggiunto", status: ConfigPopupStatus.OK })
+                        //    console.log(await res.json())
+                        //}
+                        //else {
+                        //    new Popup({type:"right", text: "Materiale Non Aggiunto", status: ConfigPopupStatus.KO })
+                        //    console.log("Materiale Aggiunto: "+await res.text())
+                        //}
+                    },
                     title: "Aggiungi ordine",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
@@ -154,8 +175,30 @@ class Routes {
             {
                 title: "Clienti", 
                 content: String(customers.length), 
+                router: "clienti",
                 form: {
-                    conn:{ endpoint: "/db/customers/add", method: "POST" },
+                    conn: async (data)=>{
+                        const body = {
+                            name: data[0].value,
+                            surname: data[1].value,
+                            address: data[2].value,
+                        }
+
+                        let res = await fetch("/db/customers/add", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(body)
+                        })
+
+                        if(res.status == 200){
+                            new Popup({type:"right", text: "Cliente Aggiunto", status: ConfigPopupStatus.OK })
+                            console.log(await res.json())
+                        }
+                        else {
+                            new Popup({type:"right", text: "Cliente Non Aggiunto", status: ConfigPopupStatus.KO })
+                            console.log("Materiale Non Aggiunto: "+await res.text())
+                        }
+                    },
                     title: "Aggiungi cliente",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
@@ -198,10 +241,88 @@ class Routes {
                 content: card.content,
                 note: card.note,
                 view: view,
-                form: card.form
+                form: card.form,
+                router: card.router,
+
             })
         }
     }
+
+    //*TABLES
+    clienti(){
+        this.init("page-customer");
+        new Table({
+            e: new TAG_HTML("table").class(["table"]).obj,
+            parent: this.main,
+            title: "I miei clienti",
+            dimension: "large",
+            style: "simple",
+            tools: {n_rows:false, n_pag:false, search:false, settings:false},
+            conn: async ()=>{
+                let res = await fetch("/db/customers/get", {
+                    method: "GET"
+                })
+                res = await res.json()
+                return res.map((e:ItemCustomer)=>{ 
+                    return {
+                        name: e.name, 
+                        surname: e.surname,
+                        address: e.address,
+                    } 
+                })
+            }
+        })
+    }
+    materiali(){
+        this.init("page-materials");
+        new Table({
+            e: new TAG_HTML("table").class(["table"]).obj,
+            parent: this.main,
+            title: "I miei materiali",
+            dimension: "large",
+            style: "simple",
+            tools: {n_rows:false, n_pag:false, search:false, settings:false},
+            conn: async ()=>{
+                let res = await fetch("/db/storehouse/get", {
+                    method: "GET"
+                })
+                res = await res.json()
+                return res.materials.map((e:ItemStoreHouseMaterial)=>{ 
+                    return {
+                        id: String(e.id),
+                        name: e.name,
+                        free: String(e.free),
+                        blocked: String(e.blocked),
+                    } 
+                })
+            }
+        })
+    }
+    ordini(){
+        this.init("page-orders");
+        new Table({
+            e: new TAG_HTML("table").class(["table"]).obj,
+            parent: this.main,
+            title: "I miei ordini",
+            dimension: "large",
+            style: "simple",
+            tools: {n_rows:false, n_pag:false, search:false, settings:false},
+            conn: async ()=>{
+                let res = await fetch("/db/orders/get", {
+                    method: "GET"
+                })
+                res = await res.json()
+                return res.map((e:ItemCustomer)=>{ 
+                    return {
+                        name: e.name, 
+                        surname: e.surname
+                    } 
+                })
+            }
+        })
+    }
+
+    //UPGRADE v0.0.2
     progetti(){
         this.init("page-projects");
     }   

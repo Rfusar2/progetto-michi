@@ -6,8 +6,7 @@ type SettingsTools = {
 }
 type TableDimension = "small" | "large";
 type TableStyle = "simple" | "paging";
-type TableFilterColumns = "full" | "expired"; //Sperimentale
-
+type TableFilterColumns = "storehouse" | "orders" | "customers"; //Sperimentale
 type TableProps = {
     e: HTMLElement;
     parent:HTMLElement;
@@ -15,15 +14,14 @@ type TableProps = {
     dimension: TableDimension;
     style: TableStyle;
     tools: SettingsTools;
-    page: TableFilterColumns;
+    conn?: ()=>Promise<void>;
 }
 type ContentTableProps = {
     settings: SettingsTools;
     parent: HTMLElement;
     width_columns?: string;
-    current_page: TableFilterColumns;
+    conn?: ()=>Promise<void>;
 }
-
 
 class SettingsTable {
     tools: SettingsTools;
@@ -59,9 +57,7 @@ class HeaderTable {
         this.input_set_n_rows = this.create_setRows();
         this.search = this.input_set_search ? this.input_set_search.value : "";
 
-        this.obj.append(
-            this.containerTools
-        )
+        this.obj.append(this.containerTools)
 
         this.getEvents();
     }
@@ -161,7 +157,7 @@ class ContentTable {
     data: Data[];
     pages: Data[][];
     page: Data[];
-    current_page: TableFilterColumns;
+    conn: (()=>Promise<[void, void]>) | undefined;
     //TODO fare enum
     action_names = {
         N_PAG: "n_pag",
@@ -169,41 +165,31 @@ class ContentTable {
         SEARCH: "search",
     };
     settings: SettingsTools;
+    ready: Promise<[void, void]>;
 
-    constructor({settings, parent, width_columns, current_page}: ContentTableProps){
+    constructor({settings, parent, width_columns, conn}: ContentTableProps){
         parent.append(this.obj)
         this.settings = settings;
         this.data = [];
         this.pages = [];
         this.page = [];
-        this.current_page = current_page
-
-        this.handlerWidthColumns(parent, width_columns)
-
-        //* HANDLER_EMPTY_ROWS
-        //*     per aggingere righe vuote
-        //*     nel caso n_rows = 25 ma ho 10 record 
-        //*     aggiunge le righe mancanti vuote
-        //this.empty_row = {
-        //    id: "dummy-code", nomeofferta: "dummy-code", prezzo: "dummy-code", etc: "dummy-code"
-        //    altro1: "dummy-code", altro2: "dummy-code", altro3: "dummy-code", altro4: "dummy-code", 
-        //    altro5: "dummy-code", 
-        //};
+        this.conn = conn
 
         this.thead.setAttribute("label", "thead");
         this.tbody.setAttribute("label", "tbody");
         this.obj.append(this.thead, this.tbody);
         
-        this.toScreenNameColumns();
-        
         //Fetch
-        this.setContent(true);
+        this.ready = (async ()=>{
+            await this.toScreenNameColumns()
+            await this.handlerWidthColumns(parent, width_columns)
+            await this.setContent(true)
+        })()
     }
 
-    handlerWidthColumns(parent:HTMLElement, width_columns:string|undefined){
+    async handlerWidthColumns(parent:HTMLElement, width_columns:string|undefined){
         //*per adattare il numero di colonne con i dati passsati
         //*nel caso non sia settata la lunghezza delle colonne
-        this.getData() 
         let style = ".row, .table-titles { grid-template-columns: " 
         const addStyle = new TAG_HTML("style").obj
         if(!width_columns){ 
@@ -217,8 +203,8 @@ class ContentTable {
         SELECT.one("head").append(addStyle)
     }
 
-    toScreenNameColumns(){
-        //TODO AGGIUNGERE GESTIONE FILTRO COLONNE
+    async toScreenNameColumns(){
+        await this.getData()
         let riga = new TAG_HTML("div").class(["table-titles"]).obj;
         for(const th_text of Object.keys(this.data[0])){
             const container_th = new TAG_HTML("div")
@@ -270,8 +256,6 @@ class ContentTable {
             case "SCADUTO":target.classList.add("badge-error");break;
             case "INSCADENZA":target.classList.add("badge-warning");break;
         }
-
-        console.log(target)
         const container_badge = new TAG_HTML("div").class(["container-badge"]).obj
         container_badge.append(target);
         
@@ -319,21 +303,26 @@ class ContentTable {
         //}
     }
 
-    //TODO FARE FETCH DATI 
-    getData(){ 
-        switch(this.current_page){
-            case "full": this.data = EXAMPLE_DATA.full(); break;
-            case "expired": this.data = EXAMPLE_DATA.expired(); break;
-            default: this.data = EXAMPLE_DATA.full();break;
+    async getData(){ 
+        if(this.conn) { 
+            this.data = await this.conn(); 
+            return 
         }
+
+        //switch(this.dbName){
+        //    case "full": this.data = EXAMPLE_DATA.full(); break;
+        //    case "expired": this.data = EXAMPLE_DATA.expired(); break;
+        //    default: this.data = EXAMPLE_DATA.full();break;
+        //}
+
     }
 
-    update(doQuery:boolean){
-        if(doQuery){ this.getData(); }
+    async update(doQuery:boolean){
+        if(doQuery){ await this.getData(); }
 
     }
 
-    setContent(doQuery:boolean, filter?:{name: string; value:string}){
+    async setContent(doQuery:boolean, filter?:{name: string; value:string}){
         if(filter){
             if (filter.name == this.action_names.N_PAG){
                 this.n_pag = Number(filter.value);
@@ -345,12 +334,11 @@ class ContentTable {
                 this.search = filter.value;
             }
         }
-        this.update(doQuery);
+        await this.update(doQuery);
         
         this.init_book(this.search);
         this.toScreenBody();
     }
-
 }
 
 
@@ -358,17 +346,15 @@ class ContentTable {
 class Table {
     obj: HTMLElement;
     settings = new SettingsTable();
-    page: TableFilterColumns;
     isDark = true; //da togliere
 
     header: HeaderTable;
     table:  ContentTable;
     footer = new FooterTable(0, 0);
 
-    constructor({e, parent, title, dimension, style, tools, page}:TableProps){
+    constructor({e, parent, title, dimension, style, tools, conn}:TableProps){
         parent.append(e)
         this.obj = e;
-        this.page = page;
         this.obj.setAttribute("data-colorschema", "dark")
         this.obj.classList.add(`table-${dimension}`);
         this.settings.tools = tools;
@@ -377,10 +363,15 @@ class Table {
         this.table = new ContentTable({
             settings: tools, 
             parent: this.obj,
-            current_page: page,
-
+            conn: conn,
         });
 
+    }
+
+    async loadContent({style, tools, conn}):ContentTable{
+        //console.log(this.table)
+        await this.table.ready
+        //console.log(this.table)
         switch(style){
             case "paging": {
                 const N_PAGES = this.table.pages.length;
@@ -390,9 +381,8 @@ class Table {
                 break;
             }
         }
-
-
         this.set_events();
+        return table
     }
 
     set_events(){
