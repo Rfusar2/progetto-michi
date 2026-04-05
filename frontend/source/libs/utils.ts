@@ -84,68 +84,22 @@ class GENERATE {
 }
 
 //from api
-type Data = {
-    Id?:string;
-    Tipologia?:string;
-    Status?:string;
-    NBolletta?:string;
-    Emissione?:string;
-    Durata?:string;
-    Importo?:string;
-    Scadenza?:string;
-    Consumo?:string;
-    ConsumoAnnuo?:string;
-}
-
-
-class EXAMPLE_DATA {
-    static full():Data[]{
-        const data:Data[] = [];
-        for (let i = 0; i < 500; i++) {
-            data.push({
-                Id: String(i + 1),
-                Tipologia:    GENERATE.get(["LUCE", "GAS"]),
-                Status:       GENERATE.get(["attivo", "scaduto","in scadenza"]),
-                NBolletta:    String(GENERATE.number_string(6)),
-                Emissione:    String(GENERATE.date(new Date(2024, 0 ,1), new Date(2028, 0, 1))),
-                Durata:       "Indeterminato",
-                Importo:      GENERATE.price(),
-                Scadenza:     String(GENERATE.date(new Date(2024, 0 ,1), new Date(2028, 0, 1))),
-                ConsumoAnnuo: String(GENERATE.number_string(5)),
-            });
-        }
-        return data;
-    }
-    static expired():Data[]{
-        const data:Data[] = [];
-        for (let i = 0; i < 500; i++) {
-            data.push({
-                Id: String(i + 1),
-                Tipologia:    GENERATE.get(["LUCE", "GAS"]),
-                Status:       "in scadenza",
-                NBolletta:    String(GENERATE.number_string(6)),
-                Durata:       "Indeterminato",
-                Scadenza:     String(GENERATE.date(new Date(2024, 0 ,1), new Date(2028, 0, 1))),
-                ConsumoAnnuo: String(GENERATE.number_string(5)),
-            });
-        }
-        return data;
-    }
-
-    static card_home():Data[]{
-        const data:Data[] = [];
-        for (let i = 0; i < 500; i++) {
-            data.push({
-                Tipologia:    GENERATE.get(["LUCE", "GAS"]),
-                Status:       "attivo",
-                NBolletta:    String(GENERATE.number_string(6)),
-                Scadenza:     String(GENERATE.date(new Date(2024, 0 ,1), new Date(2028, 0, 1))),
-            });
-        }
-        return data;
-
-    }
-}
+type Data = ItemCustomer[] | ItemOrder[] | ItemStoreHouseMaterial[] | ItemStoreHouseProduct[] ;
+//
+//class EXAMPLE_DATA {
+//    static customer():Data{
+//        const data:ItemCustomer[] = [];
+//        for (let i = 0; i < 500; i++) {
+//            data.push({
+//                id: i + 1,
+//                name:    GENERATE.get(["prov1", "prova2"]),
+//                surname: GENERATE.get(["a", "b"]),
+//                address: GENERATE.get(["c", "d"])
+//            });
+//        }
+//        return {customers: data};
+//    }
+//}
 
 
 //const handler_colorschema = SELECT.one("#data-colorschema")

@@ -2,25 +2,34 @@ enum ConfigModelTypes {
     CENTER,
     RIGHT
 }
-
+type ConfigModelInputEvent = {
+    type: string;
+    func: ()=>void;
+}
 type ConfigModelInputProps = {
     props: object;
     tag?: string;
     options?: HTMLOptionElement[];
     label?: string;
+    event?: ConfigModelInputEvent;
 }
 
 class ConfigModelInput {
     obj: HTMLElement;
     status = false;
     input: HTMLInputElement;
-    constructor({props, tag, options, label}:ConfigModelInputProps){
+    event: ConfigModelInputEvent | undefined;
+
+    constructor({props, tag, options, label, event}:ConfigModelInputProps){
         this.obj = new TAG_HTML(tag ? tag : "input").props(props).obj
         this.input = this.obj
         switch(tag){
             case "select": 
                 if(options) { this.obj.append(...options);} break; 
         }
+        
+        if(event){ this.obj.addEventListener(event.type, event.func) }
+
         if(label){
             const input = this.obj;
             this.input = input

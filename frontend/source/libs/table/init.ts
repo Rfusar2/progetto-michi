@@ -14,13 +14,13 @@ type TableProps = {
     dimension: TableDimension;
     style: TableStyle;
     tools: SettingsTools;
-    conn?: ()=>Promise<void>;
+    conn?: ()=>Promise<[void, void]>;
 }
 type ContentTableProps = {
     settings: SettingsTools;
     parent: HTMLElement;
     width_columns?: string;
-    conn?: ()=>Promise<void>;
+    conn?: ()=>Promise<[void, void]>;
 }
 
 class SettingsTable {
@@ -165,7 +165,7 @@ class ContentTable {
         SEARCH: "search",
     };
     settings: SettingsTools;
-    ready: Promise<[void, void]>;
+    ready: Promise<void>;
 
     constructor({settings, parent, width_columns, conn}: ContentTableProps){
         parent.append(this.obj)
@@ -178,13 +178,16 @@ class ContentTable {
         this.thead.setAttribute("label", "thead");
         this.tbody.setAttribute("label", "tbody");
         this.obj.append(this.thead, this.tbody);
+
+        this.init(parent, width_columns)
         
-        //Fetch
-        this.ready = (async ()=>{
-            await this.toScreenNameColumns()
-            await this.handlerWidthColumns(parent, width_columns)
-            await this.setContent(true)
-        })()
+    }
+
+    async init(parent, width_columns) {
+        this.ready = await this.toScreenNameColumns()
+
+        this.handlerWidthColumns(parent, width_columns)
+        this.setContent(true)
     }
 
     async handlerWidthColumns(parent:HTMLElement, width_columns:string|undefined){
@@ -204,7 +207,7 @@ class ContentTable {
     }
 
     async toScreenNameColumns(){
-        await this.getData()
+        await this.getDBData()
         let riga = new TAG_HTML("div").class(["table-titles"]).obj;
         for(const th_text of Object.keys(this.data[0])){
             const container_th = new TAG_HTML("div")
@@ -303,24 +306,16 @@ class ContentTable {
         //}
     }
 
-    async getData(){ 
-        if(this.conn) { 
-            this.data = await this.conn(); 
-            return 
-        }
-
+    async getDBData(){ 
+        if(this.conn) { this.data = await this.conn() as Data; }
         //switch(this.dbName){
         //    case "full": this.data = EXAMPLE_DATA.full(); break;
         //    case "expired": this.data = EXAMPLE_DATA.expired(); break;
         //    default: this.data = EXAMPLE_DATA.full();break;
         //}
-
     }
 
-    async update(doQuery:boolean){
-        if(doQuery){ await this.getData(); }
-
-    }
+    async update(doQuery:boolean){ if(doQuery){ await this.getDBData(); } }
 
     async setContent(doQuery:boolean, filter?:{name: string; value:string}){
         if(filter){
@@ -368,7 +363,7 @@ class Table {
 
     }
 
-    async loadContent({style, tools, conn}):ContentTable{
+    async loadContent({style, tools, conn}){
         //console.log(this.table)
         await this.table.ready
         //console.log(this.table)
@@ -382,7 +377,6 @@ class Table {
             }
         }
         this.set_events();
-        return table
     }
 
     set_events(){

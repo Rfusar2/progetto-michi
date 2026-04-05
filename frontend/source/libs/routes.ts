@@ -98,6 +98,70 @@ class Routes {
                 }
             },
             {
+                title: "Prodotti", 
+                content: String(options_products.length), 
+                router: "prodotti",
+                form: {
+                    conn: async (data)=>{
+                        const body = {
+                            name: data[0].value,
+                            materials: data[2].value.split(";").map((e:string)=>Number(e)),
+                        }
+                        console.log(body)
+
+                        //let res = await fetch("/db/storehouse/products/add", {
+                        //    method: "POST",
+                        //    headers: { "Content-Type": "application/json" },
+                        //    body: JSON.stringify(body)
+                        //})
+
+                        //if(res.status == 200){
+                        //    new Popup({type:"right", text: "Prodotto Aggiunto", status: ConfigPopupStatus.OK })
+                        //    console.log(await res.json())
+                        //}
+                        //else {
+                        //    new Popup({type:"right", text: "Prodotto Non Aggiunto", status: ConfigPopupStatus.KO })
+                        //    console.log("Prodotto Non Aggiunto: "+await res.text())
+                        //}
+                    },
+                    title: "Aggiungi cliente",
+                    model: ConfigModelTypes.CENTER,
+                    inputs:[
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Nome prodotto", 
+                                name:"name",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            tag: "select",
+                            options: options_materials,
+                            label: "materiale",
+                            event: {
+                                type: "change",
+                                func: (e)=>{
+                                    const input = e.currentTarget;
+                                    const list_materials = SELECT.one("#list-materials");
+                                    list_materials.value += input.value+";"
+                                },
+                                
+                            },
+                            props: {
+                                placeholder:"Matriali...",
+                                name:"materials",
+                            }
+                        }),
+                        new ConfigModelInput({
+                            props: {
+                                placeholder:"Matriali...",
+                                name:"materials",
+                                id: "list-materials"
+                            }
+                        }),
+                    ]
+                }
+            },
+            {
                 title: "Ordini", 
                 content: String(orders.length), 
                 router: "ordini",
@@ -223,24 +287,17 @@ class Routes {
                     ]
                 }
             },
-            {
-                title: "null", 
-                content: "", 
-                note: "",
-            },
         ];
 
         //TOSCREEN
         for(let i = 0; i < cards.length; i++){
             const card = cards[i];
-            const view = i < 3
             new Card({
                 parent: s1,
                 title: card.title,
                 style: ConfigCardStyle.PRIMARY,
                 content: card.content,
-                note: card.note,
-                view: view,
+                view: true,
                 form: card.form,
                 router: card.router,
 
@@ -321,6 +378,29 @@ class Routes {
             }
         })
     }
+    prodotti(){
+        this.init("page-products");
+        new Table({
+            e: new TAG_HTML("table").class(["table"]).obj,
+            parent: this.main,
+            title: "I mio Listino",
+            dimension: "large",
+            style: "simple",
+            tools: {n_rows:false, n_pag:false, search:false, settings:false},
+            conn: async ()=>{
+                let res = await fetch("/db/storehouse/products/get", {
+                    method: "GET"
+                })
+                res = await res.json()
+                return res.products.map((e:ItemCustomer)=>{ 
+                    return {
+                        name: e.name, 
+                        surname: e.surname
+                    } 
+                })
+            }
+        })
+    }   
 
     //UPGRADE v0.0.2
     progetti(){
