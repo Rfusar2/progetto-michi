@@ -17,8 +17,8 @@ class Routes {
         //*QUERY DB
         await this.db.ready;
         const storehouse = this.db.tables.storehouse as StoreHouse;
-        const materials = storehouse.materials;
-        const products = storehouse.products;
+        const materials = storehouse.materials as ItemStoreHouseMaterial[];
+        const products = storehouse.products as ItemStoreHouseProduct[];
 
         const customers = this.db.tables.customers as ItemCustomer[];
         const orders = this.db.tables.orders as ItemOrder[];
@@ -30,9 +30,11 @@ class Routes {
         const options_products = products
             .map((e:ItemStoreHouseProduct)=>new Option(e.name, String(e.id)));
 
-        const map = new Map<number, { name: string; id: number }>();
-        storehouse.materials.forEach((e: ItemStoreHouseMaterial) => { map.set(e.id, { name: e.name, id: e.id });});
-        const options_materials = Array.from(map.values()).map((e) => new Option(e.name, String(e.id)));
+        const options_materials1 = materials
+            .map((e: ItemStoreHouseMaterial) => new Option(e.name, String(e.id) ));
+
+        const options_materials2 = materials
+            .map((e: ItemStoreHouseMaterial) => new Option(e.name, String(e.id) ));
 
         let n_materials = 0
         materials.forEach((e:ItemStoreHouseMaterial)=>n_materials+=e.free)
@@ -74,11 +76,12 @@ class Routes {
                     model: ConfigModelTypes.CENTER,
                     inputs:[
                         new ConfigModelInput({
-                            label:"Nome Materiale",
                             tag: "select",
-                            options: options_materials,
+                            options: options_materials2,
+                            label: "materiale",
                             props: {
-                                name:"name",
+                                placeholder:"Matriali...",
+                                name:"materials",
                             }
                         }),
                         new ConfigModelInput({
@@ -124,7 +127,7 @@ class Routes {
                         //    console.log("Prodotto Non Aggiunto: "+await res.text())
                         //}
                     },
-                    title: "Aggiungi cliente",
+                    title: "Aggiungi prodotto",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
                         new ConfigModelInput({
@@ -135,7 +138,7 @@ class Routes {
                         }),
                         new ConfigModelInput({
                             tag: "select",
-                            options: options_materials,
+                            options: options_materials1,
                             label: "materiale",
                             event: {
                                 type: "change",

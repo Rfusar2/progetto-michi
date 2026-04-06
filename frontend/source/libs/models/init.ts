@@ -25,7 +25,7 @@ class ConfigModelInput {
         this.input = this.obj
         switch(tag){
             case "select": 
-                if(options) { this.obj.append(...options);} break; 
+                if(options) {console.log(this.obj, label, options); this.obj.append(...options);} break; 
         }
         
         if(event){ this.obj.addEventListener(event.type, event.func) }
@@ -110,9 +110,7 @@ class Model {
 
      createModel():HTMLElement{
         const container = new TAG_HTML("form").id("container-model").obj;
-        const model = new TAG_HTML("div")
-             .id("model-"+this._type)
-             .class(["model"]).obj;
+        const model = new TAG_HTML("div").id("model-"+this._type).class(["model"]).obj;
 
         container.append(model);
         this.container.append(container);
