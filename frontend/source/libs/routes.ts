@@ -38,6 +38,7 @@ class Routes {
 
         let n_materials = 0
         materials.forEach((e:ItemStoreHouseMaterial)=>n_materials+=e.free)
+
         
 
         //*DATA CARDS
@@ -48,11 +49,11 @@ class Routes {
                 router: "materiali",
                 form: {
                     conn: async (data)=>{
-                        const isNew = data[1].value!="";
+                        const isNew = data[2].value!="";
                         const body = {
                             id: isNew ? -1 : Number(data[0].value),
-                            name: isNew ? data[1].value : data[0].selectedOptions[0].text,
-                            free: Number(data[2].value),
+                            name: isNew ? data[2].value : data[1].selectedOptions[0].text,
+                            free: Number(data[0].value),
                             blocked: 0,
                         }
                         //console.log("OBJECT", body)
@@ -75,26 +76,25 @@ class Routes {
                     title: "Aggiungi item",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
-                        new ConfigModelInput({
+                        new MyInput({
+                            label:"Quantita",
+                            props: {
+                                name:"free",
+                                type: "number",
+                            }
+                        }),
+                        new MyInput({
                             tag: "select",
                             options: options_materials2,
-                            label: "materiale",
                             props: {
-                                placeholder:"Matriali...",
                                 name:"materials",
                             }
                         }),
-                        new ConfigModelInput({
+                        new MyInput({
+                            label: "Devi registrare un prodotto?"
                             props: {
-                                placeholder:"Nuovo Materiale ?",
+                                placeholder:"inserisci il nome ",
                                 name:"new-material",
-                            }
-                        }),
-                        new ConfigModelInput({
-                            props: {
-                                placeholder:"Quantita",
-                                name:"free",
-                                type: "number",
                             }
                         }),
                     ]
@@ -110,38 +110,36 @@ class Routes {
                             name: data[0].value,
                             materials: data[2].value.split(";").map((e:string)=>Number(e)),
                         }
-                        console.log(body)
 
-                        //let res = await fetch("/db/storehouse/products/add", {
-                        //    method: "POST",
-                        //    headers: { "Content-Type": "application/json" },
-                        //    body: JSON.stringify(body)
-                        //})
+                        let res = await fetch("/db/storehouse/products/add", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(body)
+                        })
+                        if(res.status == 200){
+                            const text = await res.json()
+                            console.log(text)
+                            new Popup({type:"right", text: `${data[0].value} Aggiunto`, status: ConfigPopupStatus.OK })
+                            console.log(await res.json())
+                        }
+                        else {
+                            const text = await res.text()
 
-                        //if(res.status == 200){
-                        //    new Popup({type:"right", text: "Prodotto Aggiunto", status: ConfigPopupStatus.OK })
-                        //    console.log(await res.json())
-                        //}
-                        //else {
-                        //    new Popup({type:"right", text: "Prodotto Non Aggiunto", status: ConfigPopupStatus.KO })
-                        //    console.log("Prodotto Non Aggiunto: "+await res.text())
-                        //}
+                            new Popup({type:"right", text: text, status: ConfigPopupStatus.KO })
+                            console.log("Prodotto Non Aggiunto: "+text)
+                        }
                     },
                     title: "Aggiungi prodotto",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
-                        new ConfigModelInput({
-                            props: {
-                                placeholder:"Nome prodotto", 
-                                name:"name",
-                            }
+                        new MyInput({
+                            label:"Nome prodotto", 
                         }),
-                        new ConfigModelInput({
+                        new MyInput({
                             tag: "select",
                             options: options_materials1,
-                            label: "materiale",
                             event: {
-                                type: "change",
+                                type: "input",
                                 func: (e)=>{
                                     const input = e.currentTarget;
                                     const list_materials = SELECT.one("#list-materials");
@@ -149,12 +147,8 @@ class Routes {
                                 },
                                 
                             },
-                            props: {
-                                placeholder:"Matriali...",
-                                name:"materials",
-                            }
                         }),
-                        new ConfigModelInput({
+                        new MyInput({
                             props: {
                                 placeholder:"Matriali...",
                                 name:"materials",
@@ -171,68 +165,69 @@ class Routes {
                 form: {
                     //TODO da finire
                     conn: async (data)=>{
-                        const isNew = data[1].value!="";
                         const body = {
+                            name: data[0].value
+                            products: data[2].value.split(";").map((e:string)=>Number(e)),
+                            customer: Number(data[3].value),
+                            status: Number(data[4].value),
+                            description: data[5].value
                         }
-                        console.log(data)
 
-                        //let res = await fetch("/db/orders/add", {
-                        //    method: "POST",
-                        //    headers: { "Content-Type": "application/json" },
-                        //    body: JSON.stringify(body)
-                        //})
+                        let res = await fetch("/db/orders/add", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(body)
+                        })
 
-                        //if(res.status == 200){
-                        //    new Popup({type:"right", text: "Materiale Aggiunto", status: ConfigPopupStatus.OK })
-                        //    console.log(await res.json())
-                        //}
-                        //else {
-                        //    new Popup({type:"right", text: "Materiale Non Aggiunto", status: ConfigPopupStatus.KO })
-                        //    console.log("Materiale Aggiunto: "+await res.text())
-                        //}
+                        if(res.status == 200){
+                            const text = await res.json()
+                            new Popup({type:"right", text: "Ordine Aggiunto", status: ConfigPopupStatus.OK })
+                            console.log(text)
+                        }
+                        else {
+                            const text = await res.text()
+                            new Popup({type:"right", text: text, status: ConfigPopupStatus.KO })
+                            console.log("Ordine Aggiunto: "+text)
+                        }
                     },
                     title: "Aggiungi ordine",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
-                        new ConfigModelInput({
-                            props: {
-                                placeholder:"Nome Ordine", 
-                                name:"name",
-                            }
+                        new MyInput({
+                            label:"Nome Ordine", 
                         }),
-                        new ConfigModelInput({
-                            label:"Cliente",
-                            tag: "select",
-                            options: options_customers,
-                            props: {
-                                name:"customer",
-                            }
-                        }),
-                        new ConfigModelInput({
+                        new MyInput({
                             label:"Prodotto",
                             tag: "select",
                             options: options_products,
-                            props: {
-                                name:"material",
+                            event: {
+                                type: "change",
+                                func: (e)=>{
+                                    const input = e.currentTarget
+                                    const carrello = SELECT.one("#ordine-carrello")
+                                    carrello.value += input.value+";"
+
+                                }
                             }
                         }),
-                        new ConfigModelInput({
-                            props: {
-                                placeholder:"Quantita",
-                                name:"quantity",
-                            }
+                        new MyInput({
+                            label:"Carrello",
+                            props: {id: "ordine-carrello"}
                         }),
-                        new ConfigModelInput({
+
+                        new MyInput({
+                            label:"Cliente",
+                            tag: "select",
+                            options: options_customers,
+                        }),
+                        new MyInput({
                             label:"Status",
                             tag: "select",
                             options: [new Option("Attesa", "0"), new Option("Working", "1")],
-                            props: {
-                                name:"description",
-                            }
                         }),
-                        new ConfigModelInput({
+                        new MyInput({
+                            label:"Descrizione",
                             props: {
-                                placeholder:"Descrizione",
                                 name:"description",
                             }
                         }),
@@ -269,19 +264,19 @@ class Routes {
                     title: "Aggiungi cliente",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
-                        new ConfigModelInput({
+                        new MyInput({
                             props: {
                                 placeholder:"Nome Cliente", 
                                 name:"name",
                             }
                         }),
-                        new ConfigModelInput({
+                        new MyInput({
                             props: {
                                 placeholder:"Cognome Cliente", 
                                 name:"surname",
                             }
                         }),
-                        new ConfigModelInput({
+                        new MyInput({
                             props: {
                                 placeholder:"Indirizzo Cliente",
                                 name:"address",
@@ -331,6 +326,12 @@ class Routes {
                     } 
                 })
             }
+            ths: [
+                ["id", ""],
+                ["name", "Nome Cliente"],
+                ["surname", "Cognome Cliente"],
+                ["address", "Indirizzo Cliente"],
+            ]
         })
     }
     materiali(){
@@ -356,6 +357,12 @@ class Routes {
                     } 
                 })
             }
+            ths: [
+                ["id", ""],
+                ["name", "Nome Materiale"],
+                ["free", "Liberi"],
+                ["blocked", "Bloccati"],
+            ]
         })
     }
     ordini(){
@@ -374,11 +381,11 @@ class Routes {
                 res = await res.json()
                 return res.map((e:ItemCustomer)=>{ 
                     return {
-                        name: e.name, 
-                        surname: e.surname
+                        id: String(e.name),
                     } 
                 })
             }
+            ths: [["id", ""]]
         })
     }
     prodotti(){
@@ -391,17 +398,23 @@ class Routes {
             style: "simple",
             tools: {n_rows:false, n_pag:false, search:false, settings:false},
             conn: async ()=>{
-                let res = await fetch("/db/storehouse/products/get", {
+                let res = await fetch("/db/storehouse/get", {
                     method: "GET"
                 })
                 res = await res.json()
                 return res.products.map((e:ItemCustomer)=>{ 
                     return {
+                        id: String(e.id), 
                         name: e.name, 
-                        surname: e.surname
+                        status: String(e.status),
                     } 
                 })
-            }
+            },
+            ths: [
+                ["id", ""],
+                ["name", "Nome Prodotto"],
+                ["status", "Status"],
+            ]
         })
     }   
 

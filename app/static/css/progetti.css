@@ -1,0 +1,9 @@
+.page-progetti {
+    height: calc(100vh - 80px);
+
+}
+.page-progetti > section:nth-child(1) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

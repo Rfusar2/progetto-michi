@@ -1,3 +1,4 @@
+
 type ConfigChartProps = {
     parent: HTMLElement;
     n_docs_luce: number;

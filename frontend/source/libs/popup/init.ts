@@ -1,10 +1,11 @@
+
 enum ConfigPopupStatus {
     OK,
     KO
 }
 
 type ConfigPopupProps = {
-    type: string;
+    type: "left" | "right";
     text: string;
     status: ConfigPopupStatus;
 }

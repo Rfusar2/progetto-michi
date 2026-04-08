@@ -1,0 +1,34 @@
+.input {
+    color: var(--color-text);
+    background: transparent;
+    border:none;
+    border-bottom: 1px solid var(--light-blue);
+    outline: none;
+    padding: 5px;
+}
+
+.container-select > select {
+    margin-left: 20px;
+    color: #fff;
+    background: var(--bg-card);
+    border: 1px solid #fff2;
+    border-radius: 5px;
+    padding: 5px;
+    outline: none;
+}
+
+.container-select > select > option {
+    color: #fff;
+    background: var(--bg-card);
+}
+
+.container-input .label {
+    font-size: .7rem;
+    padding-bottom: 5px;
+}
+
+.container-input {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}

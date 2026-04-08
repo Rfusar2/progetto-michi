@@ -1,0 +1,40 @@
+#card-details-customer{
+    width: 80%;
+    background: var(--bg-card);
+    border-radius: 7px;
+    box-shadow: 2px 4px 6px #0006;
+}
+
+#card-details-customer .card-details-container-inputs{
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    gap: 20px;
+    padding-top: 20px;
+    padding-bottom: 0px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+
+#card-details-customer .card-details-container-inputs:nth-child(1){
+}
+
+#card-details-customer > main > section {
+    padding: 20px;
+}
+#card-details-customer > main > section:nth-child(1) {
+    padding-bottom: 10px;
+}
+
+#card-details-customer > main {
+
+}
+#card-details-customer > footer {
+    position:relative;
+    height: 70px;
+}
+#card-details-customer #btn-send {
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+}

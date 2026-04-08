@@ -4,9 +4,10 @@ type SettingsTools = {
     search: boolean;
     settings: boolean;
 }
+const TAG_ID = "id"
 type TableDimension = "small" | "large";
 type TableStyle = "simple" | "paging";
-type TableFilterColumns = "storehouse" | "orders" | "customers"; //Sperimentale
+type TableFilterColumns = "storehouse" | "orders" | "customers";
 type TableProps = {
     e: HTMLElement;
     parent:HTMLElement;
@@ -15,12 +16,16 @@ type TableProps = {
     style: TableStyle;
     tools: SettingsTools;
     conn?: ()=>Promise<Data[]>;
+    ths: string[][];
+    router: Routes;
 }
 type ContentTableProps = {
     settings: SettingsTools;
     parent: HTMLElement;
     width_columns?: string;
     conn?: ()=>Promise<Data[]>;
+    ths: string[][];
+    router?: Routes;
 }
 
 class SettingsTable {
@@ -141,7 +146,7 @@ class FooterTable {
 
     setCurrentPage(){
         this.btn_prec.style.opacity = this.n_pag+1 > 1 ? "1" : "0";
-        this.span.textContent = `${this.n_pag+1}-${this.n_pages}`;
+        this.span.textContent = String(this.n_pag+1)+"-"+String(this.n_pages);
     }
 }
 
@@ -162,25 +167,29 @@ class ContentTable {
     action_names = {
         N_PAG: "n_pag",
         N_ROWS: "n_rows",
-        SEARCH: "search",
+       SEARCH: "search",
     };
+    ths: string[][];
+    rows: HTMLElement[] = [];
     settings: SettingsTools;
+    router: Routes;
     ready: Promise<void>;
 
-    constructor({settings, parent, width_columns, conn}: ContentTableProps){
+    constructor({settings, parent, width_columns, conn, ths, router}: ContentTableProps){
         parent.append(this.obj)
         this.settings = settings;
         this.data = [];
         this.pages = [];
         this.page = [];
-        this.conn = conn
+        this.conn = conn;
+        this.ths = ths;
+        this.router;
 
         this.thead.setAttribute("label", "thead");
         this.tbody.setAttribute("label", "tbody");
         this.obj.append(this.thead, this.tbody);
 
-        this.init(parent, width_columns)
-        
+        this.ready = this.init(parent, width_columns)
     }
 
     async init(parent, width_columns) {
@@ -195,13 +204,16 @@ class ContentTable {
         //*nel caso non sia settata la lunghezza delle colonne
         let style = ".row, .table-titles { grid-template-columns: " 
         const addStyle = new TAG_HTML("style").obj
+        const ths = this.ths.filter((e:string[])=>e[0]!==TAG_ID)
+
         if(!width_columns){ 
-            const n_columns = Object.keys(this.data[0]).length;
+            //const n_columns = Object.keys(this.data[0]).length;
+            const n_columns = ths.length;
             const width_table = parent.getBoundingClientRect().width;
             const width_column = Math.floor(width_table / n_columns)-2;
-            style+=`repeat(${n_columns}, ${width_column}px) }`
-        }
-        else { style+=`${width_columns} }`; }
+            style += "repeat(" + String(n_columns) + ", " + String(width_column) + "px) }";
+}
+        else { style+=`${width_columns} }`}
         addStyle.textContent = style;
         SELECT.one("head").append(addStyle)
     }
@@ -209,7 +221,11 @@ class ContentTable {
     async toScreenNameColumns(){
         await this.getDBData()
         let riga = new TAG_HTML("div").class(["table-titles"]).obj;
-        for(const th_text of Object.keys(this.data[0])){
+        //for(const th_text of Object.keys(this.data[0])){
+
+        const ths = this.ths.filter((e:string[]) => e[0] !== TAG_ID);
+
+        for(const [_, th_text] of ths){
             const container_th = new TAG_HTML("div")
                 .class(["container-th"])
                 .attr({colorschema: "dark"}).obj;
@@ -225,22 +241,29 @@ class ContentTable {
         this.obj.querySelector('[label="tbody"]')!.innerHTML = "";
 
         for(let i=0; i < this.page.length; i++){
-            const record = this.page[i];
-            const riga = new TAG_HTML("div").class([i%2==0 ? "row-0" : "row-1", "row"]).obj;
-
+            const record:Data[] = this.page[i];
+            const riga = new TAG_HTML("div").class(["row", i%2==0 ? "row-0" : "row-1"]).obj;
+            this.rows.push(riga)
             for(const [k, v] of Object.entries(record)){
-                const container_td = new TAG_HTML("div")
-                    .class(["container-td"])
-                    .attr({colorschema: "dark"}).obj;
-
-                const td = new TAG_HTML("span").props({textContent: v}).obj;
-                
-                //* HANDLER_BADGES
-                switch(k.toLowerCase()){
-                    case "status": this.fieldStatus(container_td, td);break;
-                    default:container_td.append(td);break;
+                if(k==TAG_ID){
+                    riga.setAttribute("record-id", v)
+                    continue
                 }
 
+                const container_td = new TAG_HTML("div").class(["container-td"]).attr({ colorschema: "dark" }).obj;
+                const td = new TAG_HTML("span").props({ textContent: v }).obj;
+                //* HANDLER_BADGES
+                switch (k.toLowerCase()) {
+                    case "status":
+                    case "type":
+                    case "active":
+                    case "valid":
+                        this.fieldStatus(container_td, td);
+                        break;
+                    default:
+                        container_td.append(td);
+                        break;
+                }
                 riga.append(container_td);
                 //* HANDLER_EMPTY_ROWS
                 //if(v=="dummy-code"){ td.style.opacity = "0"; }
@@ -309,14 +332,17 @@ class ContentTable {
     async getDBData(){ 
         if(this.conn) { 
             const data = await this.conn();
-            console.log(data)
-            this.data = data
+            //*Filtro e i dati con le colonne scelte
+            const ids_column = this.ths.map((e:string[])=>e[0])
+            this.data = data.map((e: object) => {
+                const filteredEntries = Object.entries(e)
+                    .filter(([key]) => ids_column.includes(key))
+                    .sort(([a], [b]) => ids_column.indexOf(a) - ids_column.indexOf(b));
+                return Object.fromEntries(filteredEntries);
+            });
+            return
         }
-        //switch(this.dbName){
-        //    case "full": this.data = EXAMPLE_DATA.full(); break;
-        //    case "expired": this.data = EXAMPLE_DATA.expired(); break;
-        //    default: this.data = EXAMPLE_DATA.full();break;
-        //}
+        //this.data = EXAMPLE_DATA.customers().customers
     }
 
     async update(doQuery:boolean){ if(doQuery){ await this.getDBData(); } }
@@ -351,11 +377,12 @@ class Table {
     table:  ContentTable;
     footer = new FooterTable(0, 0);
 
-    constructor({e, parent, title, dimension, style, tools, conn}:TableProps){
+
+    constructor({e, parent, title, dimension, style, tools, conn, ths, router}:TableProps){
         parent.append(e)
         this.obj = e;
         this.obj.setAttribute("data-colorschema", "dark")
-        this.obj.classList.add(`table-${dimension}`);
+        this.obj.classList.add("table-"+dimension);
         this.settings.tools = tools;
         
         this.header = new HeaderTable(this.settings.tools, title,this.obj);
@@ -363,19 +390,22 @@ class Table {
             settings: tools, 
             parent: this.obj,
             conn: conn,
+            ths: ths
+            router: router
         });
+
+        this.loadContent(style)
 
     }
 
-    async loadContent({style, tools, conn}: {style:TableStyle, tools: SettingsTools, conn:()=>Promise<[void, void]> | undefined}){
-        //console.log(this.table)
+    async loadContent(style:TableStyle){
         await this.table.ready
-        //console.log(this.table)
         switch(style){
             case "paging": {
                 const N_PAGES = this.table.pages.length;
                 const footer = new FooterTable(0, N_PAGES);
-                this.obj.append(footer.obj); break;
+                console.log(N_PAGES, this.obj, footer)
+                this.obj.append(footer.obj);
                 this.footer = footer;
                 break;
             }
@@ -421,6 +451,13 @@ class Table {
             }
             catch(err){console.log("Valore non valido: "+err);}
         })
+
+        //*EVENTO LINK CARTA DETTALGIO
+        for(const row of this.table.rows){
+            row.addEventListener("click", ()=>{
+                //this.table.router.document_details(row.getAttribute("record-id"))
+            })
+        }
 
         //*EVENTO SET ricerca
         this.header.input_set_search.addEventListener("input", (e)=>{

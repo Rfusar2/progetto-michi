@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	_ "log"
+	"fmt"
     "net/http"
 )
 
@@ -16,16 +17,13 @@ type ITEM_CUSTOMER struct {
 	Address string `json:"address"`
 }
 //* order
-type ITEM_ORDER_DETAILS struct {
-	Quantity int `json:"quantity"`
-	Product int `json:"product"`
-	Description string `json:"description"`
-}
 type ITEM_ORDER struct {
 	Id int `json:"id"`
 	Name string `json:"name"`
 	Customer int `json:"customer"`
-	Details ITEM_ORDER_DETAILS `json:"customer"`
+	Status int `json:"status"`
+	Products []int `json:"products"`
+	Description string `json:"description"`
 }
 //* storehouse
 type ITEM_STOREHOUSE_MATERIALS struct {
@@ -162,19 +160,20 @@ func API_PRODUCT_ADD(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, id := range input.Materials {
-		for _, material := range data.Materials {
+		for i, _ := range data.Materials {
 			//*Controllo se i materiali scelti sono disponibili
-			if(material.Id == id){
-				count_after_operation := material.Free-1
+			if(data.Materials[i].Id == id){
+				count_after_operation := data.Materials[i].Free + -1
+				
 				if(count_after_operation < 0){
 					//TODO aggiungere 'quale articolo?'
-					http.Error(w,"Materiale non disponibile",500)
+					http.Error(w,fmt.Sprintf("%v non disponibile", data.Materials[i].Name),500)
 					return
 				
 				} else {
 					//*Blocco il materiale
-					material.Blocked += +1
-					material.Free += -1
+					data.Materials[i].Blocked += 1
+					data.Materials[i].Free -= 1
 				}
 			}	
 		}
@@ -263,4 +262,81 @@ func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
 	//Response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(updateMaterial)
+}
+func API_ORDER_ADD(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "solo metodo POST", 415)
+		return
+	}
+	orders, err := GET_ORDERS()
+	if err != nil { http.Error(w, err.Error(), 500);return}
+
+
+
+	var input ITEM_ORDER
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Parsing JSON Error", 415)
+		return
+	}
+	
+
+	storehouse, err := GET_STOREHOUSE()
+	if err != nil { http.Error(w, err.Error(), 500);return}
+
+
+
+	for _, inputID := range input.Products {
+		found := false
+		for i := range storehouse.Products {
+			if storehouse.Products[i].Id == inputID {
+				if storehouse.Products[i].Status == 0 {
+					storehouse.Products[i].Status = 1
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			http.Error(w, fmt.Sprintf("%v non trovato", input.Name), 500)
+			return
+		}
+	}
+
+
+
+	lastID := -1
+	if len(orders) > 0 { lastID = orders[len(orders)-1].Id }
+
+	newOrder := ITEM_ORDER{
+		Id:          lastID+1,
+		Name:        input.Name,
+		Customer:    input.Customer,
+		Status:      input.Status,
+		Products:    input.Products,
+		Description: input.Description,
+	}
+	orders = append(orders, newOrder)
+
+	fmt.Println("ho creato order: ",newOrder)
+	fmt.Println("orders: ",orders)
+
+
+	//Save
+	file1, err := json.MarshalIndent(orders, "", "  ")
+	if err != nil { http.Error(w, err.Error(), 500);return}
+	if err := os.WriteFile("app/database/orders.json", file1, 0644); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	file2, err := json.MarshalIndent(storehouse, "", "  ")
+	if err != nil { http.Error(w, err.Error(), 500);return}
+	if err := os.WriteFile("app/database/storehouse.json", file2, 0644); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	//Response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newOrder)
 }

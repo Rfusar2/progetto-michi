@@ -1,3 +1,4 @@
+
 type ColorSchema = "light" | "dark";
 
 class Navbar {

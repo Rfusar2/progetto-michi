@@ -1,4 +1,5 @@
-class TAG_HTML {
+
+	class TAG_HTML {
     obj: HTMLElement;
         
     constructor(tag: string){
@@ -84,8 +85,8 @@ class GENERATE {
 }
 
 //from api
-type Data = ItemCustomer[] | ItemOrder[] | ItemStoreHouseMaterial[] | ItemStoreHouseProduct[] ;
-//
+type Data = object[];
+
 //class EXAMPLE_DATA {
 //    static customer():Data{
 //        const data:ItemCustomer[] = [];
@@ -100,20 +101,3 @@ type Data = ItemCustomer[] | ItemOrder[] | ItemStoreHouseMaterial[] | ItemStoreH
 //        return {customers: data};
 //    }
 //}
-
-
-//const handler_colorschema = SELECT.one("#data-colorschema")
-//const callback_mutation = (mutationList, observer)=>{
-//    for(const mutation of mutationList){
-//        //if(mutation.type === "attributes"){
-//        //    const isDark = handler_colorschema.getAttribute("colroschema") == "light";
-//        //    handler_colorschema.setAttribute("colorschema", isDark?"light":"dark");
-//        //    for(const e of SELECT.all("[data-colorschema]")){ e.dataset.colorschema = isDark?"dark":"light";}
-//
-//        //    console.log(isDark);
-//        //}
-//    }
-//}
-//const observer = new MutationObserver(callback_mutation);
-//observer.observe(handler_colorschema, {attributes:true})
-
