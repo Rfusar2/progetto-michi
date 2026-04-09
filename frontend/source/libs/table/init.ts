@@ -277,10 +277,15 @@ class ContentTable {
         target.textContent = target.textContent.toUpperCase();
         target.style.fontSize = "10px";
         target.setAttribute("data-colorschema","dark");
-        switch(target.textContent.replaceAll(" ", "")){
-            case "ATTIVO":target.classList.add("badge-success");break;
-            case "SCADUTO":target.classList.add("badge-error");break;
-            case "INSCADENZA":target.classList.add("badge-warning");break;
+        switch(target.textContent.replaceAll(" ", "").toLowerCase()){
+            case "inlavorazione":
+            case "libero":
+                target.classList.add("badge-success");break;
+            case "finito":
+            case "bloccato":
+                target.classList.add("badge-error");break;
+            case "attesa":
+                target.classList.add("badge-warning");break;
         }
         const container_badge = new TAG_HTML("div").class(["container-badge"]).obj
         container_badge.append(target);

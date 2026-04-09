@@ -44,71 +44,76 @@ class Routes {
         //*DATA CARDS
         const cards = [
             {
-                title: "Materiali disponibili", 
-                content: String(n_materials), 
-                router: "materiali",
+                title: "Clienti", 
+                content: String(customers.length), 
+                router: "clienti",
                 form: {
                     conn: async (data)=>{
-                        const isNew = data[2].value!="";
                         const body = {
-                            id: isNew ? -1 : Number(data[0].value),
-                            name: isNew ? data[2].value : data[1].selectedOptions[0].text,
-                            free: Number(data[0].value),
-                            blocked: 0,
+                            name: data[0].value,
+                            surname: data[1].value,
+                            address: data[2].value,
                         }
-                        //console.log("OBJECT", body)
 
-                        let res = await fetch("/db/storehouse/materials/add", {
+                        let res = await fetch("/db/customers/add", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(body)
                         })
 
                         if(res.status == 200){
-                            new Popup({type:"right", text: "Materiale Aggiunto", status: ConfigPopupStatus.OK })
+                            new Popup({type:"right", text: "Cliente Aggiunto", status: ConfigPopupStatus.OK })
                             console.log(await res.json())
                         }
                         else {
-                            new Popup({type:"right", text: "Materiale Non Aggiunto", status: ConfigPopupStatus.KO })
-                            console.log("Materiale Aggiunto: "+await res.text())
+                            new Popup({type:"right", text: "Cliente Non Aggiunto", status: ConfigPopupStatus.KO })
+                            console.log("Materiale Non Aggiunto: "+await res.text())
                         }
                     },
-                    title: "Aggiungi item",
+                    title: "Aggiungi cliente",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
                         new MyInput({
-                            label:"Quantita",
                             props: {
-                                name:"free",
-                                type: "number",
+                                placeholder:"Nome Cliente", 
+                                name:"name",
                             }
                         }),
                         new MyInput({
-                            tag: "select",
-                            options: options_materials2,
                             props: {
-                                name:"materials",
+                                placeholder:"Cognome Cliente", 
+                                name:"surname",
                             }
                         }),
                         new MyInput({
-                            label: "Devi registrare un prodotto?"
                             props: {
-                                placeholder:"inserisci il nome ",
-                                name:"new-material",
+                                placeholder:"Indirizzo Cliente",
+                                name:"address",
                             }
                         }),
                     ]
                 }
             },
+
             {
                 title: "Prodotti", 
                 content: String(options_products.length), 
                 router: "prodotti",
                 form: {
                     conn: async (data)=>{
+
+                        let material_id = data[2].value.split(";").filter((e:string)=>e!=="")
+
+                        if (material_id.length == 0){
+                            material_id = [Number(data[1].childNodes[0].getAttribute("value"))]
+                        }
+                        else{
+                            material_id = material_id.map((e:string)=>Number(e))
+                        }
+
                         const body = {
                             name: data[0].value,
-                            materials: data[2].value.split(";").map((e:string)=>Number(e)),
+                            materials: material_id,
                         }
 
                         let res = await fetch("/db/storehouse/products/add", {
@@ -163,15 +168,25 @@ class Routes {
                 content: String(orders.length), 
                 router: "ordini",
                 form: {
-                    //TODO da finire
                     conn: async (data)=>{
+
+                        let product_id = data[2].value.split(";").filter((e:string)=>e!=="")
+
+                        if (product_id.length == 0){
+                            product_id = [Number(data[1].childNodes[0].getAttribute("value"))]
+                        }
+                        else{
+                            product_id = product_id.map((e:string)=>Number(e))
+                        }
+
                         const body = {
                             name: data[0].value
-                            products: data[2].value.split(";").map((e:string)=>Number(e)),
+                            products: product_id,
                             customer: Number(data[3].value),
                             status: Number(data[4].value),
                             description: data[5].value
                         }
+                        console.log(body)
 
                         let res = await fetch("/db/orders/add", {
                             method: "POST",
@@ -235,51 +250,57 @@ class Routes {
                 }
             },
             {
-                title: "Clienti", 
-                content: String(customers.length), 
-                router: "clienti",
+                title: "Materiali disponibili", 
+                content: String(n_materials), 
+                router: "materiali",
                 form: {
                     conn: async (data)=>{
+                        const isNew = data[2].value!="";
                         const body = {
-                            name: data[0].value,
-                            surname: data[1].value,
-                            address: data[2].value,
+                            id: isNew ? -1 : Number(data[0].value),
+                            name: isNew ? data[2].value : data[1].selectedOptions[0].text,
+                            free: Number(data[0].value),
+                            blocked: 0,
                         }
+                        //console.log("OBJECT", body)
 
-                        let res = await fetch("/db/customers/add", {
+                        let res = await fetch("/db/storehouse/materials/add", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(body)
                         })
 
                         if(res.status == 200){
-                            new Popup({type:"right", text: "Cliente Aggiunto", status: ConfigPopupStatus.OK })
+                            new Popup({type:"right", text: "Materiale Aggiunto", status: ConfigPopupStatus.OK })
                             console.log(await res.json())
                         }
                         else {
-                            new Popup({type:"right", text: "Cliente Non Aggiunto", status: ConfigPopupStatus.KO })
-                            console.log("Materiale Non Aggiunto: "+await res.text())
+                            new Popup({type:"right", text: "Materiale Non Aggiunto", status: ConfigPopupStatus.KO })
+                            console.log("Materiale Aggiunto: "+await res.text())
                         }
                     },
-                    title: "Aggiungi cliente",
+                    title: "Aggiungi item",
                     model: ConfigModelTypes.CENTER,
                     inputs:[
                         new MyInput({
+                            label:"Quantita",
                             props: {
-                                placeholder:"Nome Cliente", 
-                                name:"name",
+                                name:"free",
+                                type: "number",
                             }
                         }),
                         new MyInput({
+                            tag: "select",
+                            options: options_materials2,
                             props: {
-                                placeholder:"Cognome Cliente", 
-                                name:"surname",
+                                name:"materials",
                             }
                         }),
                         new MyInput({
+                            label: "Devi registrare un prodotto?"
                             props: {
-                                placeholder:"Indirizzo Cliente",
-                                name:"address",
+                                placeholder:"inserisci il nome ",
+                                name:"new-material",
                             }
                         }),
                     ]
@@ -365,8 +386,10 @@ class Routes {
             ]
         })
     }
-    ordini(){
+    async ordini(){
         this.init("page-orders");
+        await this.db.ready;
+
         new Table({
             e: new TAG_HTML("table").class(["table"]).obj,
             parent: this.main,
@@ -378,14 +401,29 @@ class Routes {
                 let res = await fetch("/db/orders/get", {
                     method: "GET"
                 })
+
+
                 res = await res.json()
                 return res.map((e:ItemCustomer)=>{ 
+                    const status = e.status==0?"attesa":e.status==1?"in lavorazione":e.status==2?"finito":"" 
+                    const customer = this.db.tables.customers.filter((customer_db:ItemCustomer)=>customer_db.id==e.customer)[0];
+
                     return {
-                        id: String(e.name),
+                        id: String(e.id),
+                        name: e.name,
+                        customer: customer.name,
+                        status: status,
+                        description: e.description,
                     } 
                 })
-            }
-            ths: [["id", ""]]
+            },
+            ths: [
+                ["id", ""],
+                ["name", "Nome Ordine"],
+                ["customer", "Cliente"],
+                ["status", "Status"],
+                ["description", "Description"],
+            ]
         })
     }
     prodotti(){
@@ -403,10 +441,11 @@ class Routes {
                 })
                 res = await res.json()
                 return res.products.map((e:ItemCustomer)=>{ 
+                    const status = e.status==0?"libero":e.status==1?"bloccato":""
                     return {
                         id: String(e.id), 
                         name: e.name, 
-                        status: String(e.status),
+                        status: status,
                     } 
                 })
             },

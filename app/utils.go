@@ -235,7 +235,7 @@ func API_MATERIAL_ADD(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		//*Aggiungi il nuovo materiale se non esiste
-		var lastID int
+		lastID := -1
 		if len(data.Materials) > 0 {
 			lastID = data.Materials[len(data.Materials)-1].Id
 		}
@@ -287,8 +287,10 @@ func API_ORDER_ADD(w http.ResponseWriter, r *http.Request) {
 
 	for _, inputID := range input.Products {
 		found := false
+		fieldname := ""
 		for i := range storehouse.Products {
 			if storehouse.Products[i].Id == inputID {
+				fieldname = storehouse.Products[i].Name
 				if storehouse.Products[i].Status == 0 {
 					storehouse.Products[i].Status = 1
 					found = true
@@ -297,7 +299,7 @@ func API_ORDER_ADD(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if !found {
-			http.Error(w, fmt.Sprintf("%v non trovato", input.Name), 500)
+			http.Error(w, fmt.Sprintf("%v non trovato", fieldname), 500)
 			return
 		}
 	}
@@ -316,9 +318,6 @@ func API_ORDER_ADD(w http.ResponseWriter, r *http.Request) {
 		Description: input.Description,
 	}
 	orders = append(orders, newOrder)
-
-	fmt.Println("ho creato order: ",newOrder)
-	fmt.Println("orders: ",orders)
 
 
 	//Save

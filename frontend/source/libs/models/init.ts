@@ -63,6 +63,7 @@ class Model {
         document.body.prepend(this.background);
         
         this.getEvents();
+        this.obj.addEventListener("load", this.load)
         //this.close(true, 1000 * 60)
     }
 
@@ -84,7 +85,7 @@ class Model {
     getEvents(){
         this.btn_send.addEventListener("click", async(e)=>{
             e.preventDefault()
-            this.conn(this.inputs)
+            this.conn(this.eInputs)
         });
 
         this.btn_close.addEventListener("click", (e)=>{e.preventDefault();this.background.remove()});
