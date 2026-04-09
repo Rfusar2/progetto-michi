@@ -74,22 +74,13 @@ class Routes {
                     model: ConfigModelTypes.CENTER,
                     inputs:[
                         new MyInput({
-                            props: {
-                                placeholder:"Nome Cliente", 
-                                name:"name",
-                            }
+                            label: "Nome Cliente"
                         }),
                         new MyInput({
-                            props: {
-                                placeholder:"Cognome Cliente", 
-                                name:"surname",
-                            }
+                           label: "Cognome Cliente", 
                         }),
                         new MyInput({
-                            props: {
-                                placeholder:"Indirizzo Cliente",
-                                name:"address",
-                            }
+                            label: "Indirizzo Cliente",
                         }),
                     ]
                 }
