@@ -248,11 +248,13 @@ class Routes {
                     conn: async (data)=>{
                         const isNew = data[2].value!="";
                         const body = {
-                            id: isNew ? -1 : Number(data[0].value),
+                            id: isNew ? -1 : Number(data[1].value),
                             name: isNew ? data[2].value : data[1].selectedOptions[0].text,
                             free: Number(data[0].value),
                             blocked: 0,
                         }
+
+
                         //console.log("OBJECT", body)
 
                         let res = await fetch("/db/storehouse/materials/add", {
