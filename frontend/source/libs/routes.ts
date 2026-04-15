@@ -453,5 +453,7 @@ class Routes {
     //UPGRADE v0.0.2
     progetti(){
         this.init("page-projects");
+
+        this.main.append("Aggiornamenti futuri...")
     }   
 }

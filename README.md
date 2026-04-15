@@ -2,13 +2,15 @@
 
 ## Database
 
+FILE: app\database\*.json
+
 ci sono tre tabelle princiapali:
 
-* storehouse
+* storehouse.json
 
-* orders
+* orders.json
 
-* customers
+* customers.json
 
 ### Struttura STOREHOUSE
 
@@ -16,15 +18,24 @@ Esempio:
 
 ```json
 {
-    "materials": [
-        {"id": 0, "name": "Cuoio", "free": 22, "blocked": 5},
-        {"id": 1, "name": "Pelle di Mucca", "free": 10, "blocked": 5 },
-    ],
-    "products": [
-        {"id": 0,"name":"cuoio + mucca","status": 0, "materials": [0, 1]},
-        {"id": 1,"name":"solo cuoio","status": 1, "materials": [0]},
-        {"id": 2,"name":"solo mucca","status": 1, "materials": [1]}
-    ]
+  "materials": [
+    {
+      "id": 0,
+      "name": "pelle mucca 20cm",
+      "free": 9,
+      "blocked": 1
+    }
+  ],
+  "products": [
+    {
+      "id": 0,
+      "name": "scpa",
+      "status": 1,
+      "materials": [
+        0
+      ]
+    }
+  ]
 }
 ```
 
@@ -40,18 +51,16 @@ Esempio:
 
 ```json
 [
-    {
-        "id": 1,
-        "name": "Titolo Ordine",
-        "customer": 0,
-        "details": [
-            {
-                "quantity": 5,
-                "product": 1,
-                "description": ""
-            }
-        ]
-    },
+  {
+    "id": 0,
+    "name": "non so",
+    "customer": 0,
+    "status": 1,
+    "products": [
+      0
+    ],
+    "description": "paga dopo 20gg"
+  }
 ]
 ```
 
@@ -61,19 +70,24 @@ Esempio:
 
 ```json
 [
-    {
-        "id": 0,
-        "name": "<nome cliente>",
-        "surname": "<cognome cliente>",
-        "address": "<indirizzo cliente>"
-    }
-
+  {
+    "id": 0,
+    "name": "",
+    "surname": "",
+    "address": ""
+  }
 ]
 ```
 
-## TODO
+### Logica
 
-1. creazioe prodotto
-    
-    il concetto che è un insieme di materiali e associazione a cliente.
+* registro dei materiali e dei clienti
 
+* associo i materiali per creare il prodotto
+
+* creo l'ordine associando il prodotto al cliente
+
+
+## INSTALLAZIONE
+
+[INSTALAZIONE](docs\installazione.mp4)
