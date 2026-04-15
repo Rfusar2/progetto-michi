@@ -90,4 +90,4 @@ Esempio:
 
 ## INSTALLAZIONE
 
-[INSTALAZIONE](docs/installazione.mp4)
+![INSTALAZIONE](docs/installazione.mp4)
